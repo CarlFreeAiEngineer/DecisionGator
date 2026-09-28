@@ -41,6 +41,9 @@
   pre#out { background: var(--code-bg); border-radius: 8px; padding: 16px 18px; overflow-x: auto; font: 15px/1.45 ui-monospace, Menlo, Consolas, monospace; margin: 0 0 1.2em; min-height: 6em; white-space: pre-wrap; }
   pre#out .err { color: var(--accent); }
   pre#out .yes { color: var(--yes); font-weight: bold; }
+  #loadingNote { border: 2px solid #e0a030; background: color-mix(in srgb, #e0a030 14%, var(--bg)); border-radius: 10px; padding: 14px 18px; margin: 0 0 1.2em; }
+  #loadingNote strong { display: block; font-size: 1.15rem; margin-bottom: .25em; }
+  #loadingNote p { margin: 0; }
   footer { margin-top: 4em; color: var(--muted); font-size: .9rem; }
   @media (max-width: 520px) { h1 { font-size: 2rem; } body { font-size: 17px; } }
 </style>
@@ -53,6 +56,11 @@
 <p>This is the same component that ships in the <a href="https://github.com/CarlFreeAiEngineer/DecisionGator">repository</a>, compiled to WebAssembly and running on YOUR CPU, inside this page. No API key. No server. No network call carries your text anywhere. Change the text or the question, then press RUN.</p>
 
 <p class="muted">The component is about 580 MB of weights and runtime, downloaded when the page opens. After that, each decision takes a fraction of a second on a laptop. Desktop Chromium, Firefox, and Safari are supported.</p>
+
+<div id="loadingNote" role="note">
+  <strong>The first run waits for a one-time download. Your application won't.</strong>
+  <p>Right now your browser is fetching the whole component, about 580 MB, across the internet. That only happens because this demo runs inside a web page. In a normal application the component is installed on your server or bundled with your app, so it is already on the machine and loads from local disk, in a small fraction of this time.</p>
+</div>
 
 <div class="bar">
   <button id="run" disabled>Loading…</button>
@@ -112,7 +120,8 @@ configure({ onProgress: ({ file, loaded, total }) => {
   fill.style.width = `${percent.toFixed(1)}%`;
   statusText.textContent = `Loading ${percent.toFixed(0)}%…`;
 } });
-const setReady = (text) => { status.className = 'ready'; statusText.textContent = text; runButton.textContent = 'Run'; runButton.disabled = false; };
+const loadingNote = document.querySelector('#loadingNote');
+const setReady = (text) => { loadingNote.hidden = true; status.className = 'ready'; statusText.textContent = text; runButton.textContent = 'Run'; runButton.disabled = false; };
 let ready = isYesP('warm up', 'Is this a warm-up?').then(
   () => setReady('Ready. Runs on your CPU; nothing leaves this page.'),
   (error) => { status.className = 'failed'; thermo.classList.remove('indeterminate'); statusText.textContent = `Failed to load: ${error.message}`; runButton.textContent = 'Failed'; throw error; },
