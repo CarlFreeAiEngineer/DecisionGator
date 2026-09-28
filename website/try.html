@@ -57,15 +57,15 @@
 
 <p class="muted">The component is about 580 MB of weights and runtime, downloaded when the page opens. After that, each decision takes a fraction of a second on a laptop. Desktop Chromium, Firefox, and Safari are supported.</p>
 
-<div id="loadingNote" role="note">
-  <strong>The first run waits for a one-time download. Your application won't.</strong>
-  <p>Right now your browser is fetching the whole component, about 580 MB, across the internet. That only happens because this demo runs inside a web page. In a normal application the component is installed on your server or bundled with your app, so it is already on the machine and loads from local disk, in a small fraction of this time.</p>
-</div>
-
 <div class="bar">
   <button id="run" disabled>Loading…</button>
   <button id="reset" class="plain">Reset the example</button>
   <span id="status"><span class="thermo indeterminate" aria-hidden="true"><span class="fill"></span></span><span id="statusText">Warming up…</span></span>
+</div>
+
+<div id="loadingNote" role="note">
+  <strong>The first run waits for a one-time download. Your application won't.</strong>
+  <p>Right now your browser is fetching the whole component, about 580 MB, across the internet. That only happens because this demo runs inside a web page. In a normal application the component is installed on your server or bundled with your app, so it is already on the machine and loads from local disk, in a small fraction of this time.</p>
 </div>
 
 <textarea id="code" spellcheck="false" aria-label="JavaScript example, editable"></textarea>
