@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Try DecisionGator</title>
+<title>Try DecisionGator 🐊</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐊</text></svg>">
 <meta name="description" content="Edit and run a DecisionGator example in your browser. The decision is made on your device; nothing you type leaves it.">
 <style>
   :root {
@@ -51,7 +52,7 @@
 <body>
 <main>
 
-<h1>Try DecisionGator<small>Edit the code. Run it. Nothing you type leaves your browser.</small></h1>
+<h1>Try DecisionGator 🐊<small>Edit the code. Run it. Nothing you type leaves your browser.</small></h1>
 
 <p>This is the same component that ships in the <a href="https://github.com/CarlFreeAiEngineer/DecisionGator">repository</a>, compiled to WebAssembly and running on YOUR CPU, inside this page. No API key. No server. No network call carries your text anywhere. Change the text or the question, then press RUN.</p>
 
@@ -123,7 +124,7 @@ configure({ onProgress: ({ file, loaded, total }) => {
 const loadingNote = document.querySelector('#loadingNote');
 const setReady = (text) => { loadingNote.hidden = true; status.className = 'ready'; statusText.textContent = text; runButton.textContent = 'Run'; runButton.disabled = false; };
 let ready = isYesP('warm up', 'Is this a warm-up?').then(
-  () => setReady('Ready. Runs on your CPU; nothing leaves this page.'),
+  () => setReady('🐊 Ready. Runs on your CPU; nothing leaves this page.'),
   (error) => { status.className = 'failed'; thermo.classList.remove('indeterminate'); statusText.textContent = `Failed to load: ${error.message}`; runButton.textContent = 'Failed'; throw error; },
 );
 

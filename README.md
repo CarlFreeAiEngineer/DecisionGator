@@ -1,4 +1,4 @@
-# DecisionGator
+# DecisionGator 🐊
 
 ## Your software probably needs this.
 
@@ -178,7 +178,7 @@ What the table hides:
 
 ## What if this gives a wrong answer?
 
-# GREAT!
+# GREAT! 🐊
 
 **That means you can add training data, retrain the model yourself easily right here in this project, and contribute your training data to the project so the whole world can benefit!**
 
