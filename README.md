@@ -28,12 +28,19 @@ You're thinking: “I wish I could just load a normal library and call a normal 
 **NOW YOU CAN!** In MANY languages and platforms; python example:
 
 ```python
-from decisiongator import is_yes
+from decisiongator import is_yes, choose
 
 appointment_requested = is_yes(
     "Any chance I could come in next Tuesday?",
     "Is this person asking for an appointment?",
-)
+)   # True
+
+teams = ["support", "billing", "sales"]
+team = teams[choose(
+    "Any chance I could get a discount if we buy 50 licenses?",
+    "Which team should handle this message?",
+    teams,
+)]   # "sales"
 ```
 
 **Don't take our word for it: [try it in your browser](https://62-84-178-253.sslip.io/DecisionGator/try.html).** Change the text or the question, press Run, and it answers on your own CPU. Nothing you type leaves the page.
