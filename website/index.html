@@ -70,14 +70,21 @@ Please. I have a family. Just valid JSON... I'm begging you.</code></pre>
 
 <h2 class="shout">Now you can.</h2>
 
-<pre><code><span class="k">from</span> decisiongator <span class="k">import</span> is_yes
+<pre><code><span class="k">from</span> decisiongator <span class="k">import</span> is_yes, choose
 
 appointment_requested = is_yes(
     <span class="c">"Any chance I could come in next Tuesday?",</span>
     <span class="c">"Is this person asking for an appointment?",</span>
-)   <span class="c"># </span><span class="y">True</span></code></pre>
+)   <span class="c"># </span><span class="y">True</span>
 
-<p>That's it. That's the whole product. A function that takes some text and a question, and returns a boolean.</p>
+teams = [<span class="c">"support"</span>, <span class="c">"billing"</span>, <span class="c">"sales"</span>]
+team = teams[choose(
+    <span class="c">"Any chance I could get a discount if we buy 50 licenses?",</span>
+    <span class="c">"Which team should handle this message?",</span>
+    teams,
+)]   <span class="c"># </span><span class="y">"sales"</span></code></pre>
+
+<p>That's it. That's the whole product. A function that takes some text and a question, and returns a boolean, or picks one option from a list.</p>
 
 <h2>A software component. Not an AI.</h2>
 
