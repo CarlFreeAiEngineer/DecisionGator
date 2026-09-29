@@ -203,3 +203,7 @@ The experimental Mac bundle is about **620 MB** and the browser bundle about **5
 The current version handles English text, yes/no questions, and multiple choice over caller-supplied options. Other decision types come later.
 
 Building it? Start with the [developer specifications](specs/README.md).
+
+## Author
+
+Made by Carl Free ([@CarlFreeAiEngineer](https://github.com/CarlFreeAiEngineer)), who trains small, specialized language models. Questions, ideas, or want to work together? carl@freeideas.com · [résumé and other work](https://ordinarydata.com/resume/)
