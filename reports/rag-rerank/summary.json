@@ -1,0 +1,185 @@
+{
+  "model": "decisiongator-0.4.1",
+  "phrasings": {
+    "dg_answers": "Does this passage answer the question \"{q}\"?",
+    "dg_relevant": "Is this passage relevant to the question \"{q}\"?"
+  },
+  "queries_per_set": 200,
+  "seed": 7,
+  "sets": {
+    "wikiqa": {
+      "random": {
+        "mrr": 0.37374383283667173,
+        "p_at_1": 0.165,
+        "ndcg10": 0.47700079058880207,
+        "recall_at_3": 0.4483333333333333,
+        "questions": 200,
+        "errors": 0,
+        "auc": 0.4709293850101073,
+        "seconds": 0.0
+      },
+      "bm25": {
+        "mrr": 0.6205144494394494,
+        "p_at_1": 0.45,
+        "ndcg10": 0.7002977112651954,
+        "recall_at_3": 0.69875,
+        "questions": 200,
+        "errors": 0,
+        "auc": 0.6121034831285959,
+        "seconds": 0.0
+      },
+      "minilm_reranker": {
+        "mrr": 0.8240555555555555,
+        "p_at_1": 0.72,
+        "ndcg10": 0.8553975453160063,
+        "recall_at_3": 0.87375,
+        "questions": 200,
+        "errors": 0,
+        "auc": 0.8508955644534287,
+        "seconds": 5.7
+      },
+      "bge_reranker": {
+        "mrr": 0.8408265345765344,
+        "p_at_1": 0.755,
+        "ndcg10": 0.8615416001502907,
+        "recall_at_3": 0.8629166666666667,
+        "questions": 200,
+        "errors": 0,
+        "auc": 0.8624825066086145,
+        "seconds": 14.5
+      },
+      "dg_answers": {
+        "mrr": 0.8303733766233766,
+        "p_at_1": 0.745,
+        "ndcg10": 0.8596358887356961,
+        "recall_at_3": 0.86875,
+        "questions": 200,
+        "errors": 0,
+        "auc": 0.8707286969367128,
+        "cutoff": {
+          "threshold": 0.5,
+          "precision": 0.3075684380032206,
+          "recall": 0.809322033898305
+        },
+        "seconds": 218.7
+      },
+      "dg_relevant": {
+        "mrr": 0.7818477633477633,
+        "p_at_1": 0.66,
+        "ndcg10": 0.8244435588468702,
+        "recall_at_3": 0.8708333333333332,
+        "questions": 200,
+        "errors": 0,
+        "auc": 0.8394179559944022,
+        "cutoff": {
+          "threshold": 0.5,
+          "precision": 0.2753403933434191,
+          "recall": 0.7711864406779662
+        },
+        "seconds": 393.0
+      },
+      "dg_choose": {
+        "mrr": 0.8113511904761904,
+        "p_at_1": 0.7,
+        "ndcg10": 0.8493419445031541,
+        "recall_at_3": 0.88625,
+        "questions": 200,
+        "errors": 0,
+        "auc": 0.9124674428549214,
+        "cutoff": {
+          "threshold": 0.5,
+          "precision": 0.8604651162790697,
+          "recall": 0.3135593220338983
+        },
+        "seconds": 1098.6
+      }
+    },
+    "msmarco": {
+      "random": {
+        "mrr": 0.3556964285714286,
+        "p_at_1": 0.14,
+        "ndcg10": 0.5011038408813957,
+        "recall_at_3": 0.38291666666666674,
+        "questions": 200,
+        "errors": 0,
+        "auc": 0.4883136163303178,
+        "seconds": 0.0
+      },
+      "bm25": {
+        "mrr": 0.4338789682539682,
+        "p_at_1": 0.2,
+        "ndcg10": 0.5656810631781247,
+        "recall_at_3": 0.505,
+        "questions": 200,
+        "errors": 0,
+        "auc": 0.5321070130673471,
+        "seconds": 0.1
+      },
+      "minilm_reranker": {
+        "mrr": 0.6654107142857143,
+        "p_at_1": 0.495,
+        "ndcg10": 0.7448623344015307,
+        "recall_at_3": 0.7641666666666665,
+        "questions": 200,
+        "errors": 0,
+        "auc": 0.7322384597541174,
+        "seconds": 7.4
+      },
+      "bge_reranker": {
+        "mrr": 0.6816309523809524,
+        "p_at_1": 0.52,
+        "ndcg10": 0.7569290219201928,
+        "recall_at_3": 0.7870833333333332,
+        "questions": 200,
+        "errors": 0,
+        "auc": 0.7495445758911312,
+        "seconds": 22.9
+      },
+      "dg_answers": {
+        "mrr": 0.533237616654702,
+        "p_at_1": 0.3316582914572864,
+        "ndcg10": 0.6442593526065318,
+        "recall_at_3": 0.6327470686767169,
+        "questions": 199,
+        "errors": 1,
+        "auc": 0.6737728681395582,
+        "cutoff": {
+          "threshold": 0.5,
+          "precision": 0.17799043062200956,
+          "recall": 0.8303571428571429
+        },
+        "seconds": 403.4
+      },
+      "dg_relevant": {
+        "mrr": 0.5139447236180905,
+        "p_at_1": 0.3015075376884422,
+        "ndcg10": 0.6285934756660608,
+        "recall_at_3": 0.6109715242881073,
+        "questions": 199,
+        "errors": 1,
+        "auc": 0.6607486504048785,
+        "cutoff": {
+          "threshold": 0.5,
+          "precision": 0.17057761732851986,
+          "recall": 0.84375
+        },
+        "seconds": 285.0
+      },
+      "dg_choose": {
+        "mrr": 0.5288306612427215,
+        "p_at_1": 0.32160804020100503,
+        "ndcg10": 0.6401802976024505,
+        "recall_at_3": 0.6101340033500838,
+        "questions": 199,
+        "errors": 1,
+        "auc": 0.6669405428371489,
+        "cutoff": {
+          "threshold": 0.5,
+          "precision": 0.43478260869565216,
+          "recall": 0.044642857142857144
+        },
+        "seconds": 280.2
+      }
+    }
+  }
+}
