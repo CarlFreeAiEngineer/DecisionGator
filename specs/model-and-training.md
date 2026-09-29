@@ -39,3 +39,5 @@ Train the binary head with binary cross-entropy or an equivalent proper probabil
 Fit a simple calibration transform on a separate representative calibration partition. Temperature scaling is the starting candidate, not a guarantee. Evaluate calibration again after export and quantization, and fit the deployed model's transform without accessing the final test labels.
 
 Choose architecture and training scale from measured accuracy, probability quality, memory, and latency. Do not prescribe reinforcement learning simply because Jev describes using it. Supervised learning and held-out calibration are the first experiment.
+
+Passage reranking for retrieval-augmented generation was measured in [the reranking report](../reports/rag-rerank/README.md): ranking is competitive, but probabilities are too high for on-topic passages that do not answer. Any improvement there is planned as additional training data on the existing architecture; see that report's follow-up section.

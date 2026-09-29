@@ -35,3 +35,12 @@ With a fixed cutoff of 0.5, "Does this passage answer" marks most passages as an
 - It is 15 to 80 times slower than the rerankers and about 60 times larger than MiniLM. Reranking 20 chunks costs 3 to 5 seconds on the M1 Pro.
 
 Verdict: not perfect, not hopeless. Ranking quality is competitive where the comparison is fair. Before training for this use, a fair test set that none of the rerankers has seen would settle the MS MARCO question, and the cost remains a reason to prefer a small dedicated reranker when speed matters. Training on "on topic but does not answer" passages would most likely make the probability usable as a cutoff.
+
+## Possible follow-up: more training, same architecture
+
+Not scheduled. If reranking becomes a supported use, improve it with training data only: keep the current model, input format, 256-token limit and API, and add no reranking-specific model, head or function. Callers keep using `is_yes_p(chunk, 'Does this passage answer the question "..."?')`.
+
+1. Write a held-out test that none of the compared rerankers was trained on: questions with several passages on the same topic, only some of which answer. Score 0.4.x on it with this script before training.
+2. Add training records in matched pairs: the same question with one on-topic passage that answers it (yes) and one that does not (no), across varied domains. Keep passages well under the token limit.
+3. Continue training from the current checkpoint as in [the 0.4.2 report](../v4.2/README.md), then rerun all existing held-out tests to check that yes/no and choice accuracy do not drop.
+4. Success means precision at the 0.5 cutoff rises well above today's 18 to 31% while ranking stays at least as good. Speed will not change; that would need a smaller model, which is out of scope here.
