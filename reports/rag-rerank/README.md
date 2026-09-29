@@ -29,8 +29,8 @@ With a fixed cutoff of 0.5, "Does this passage answer" marks most passages as an
 
 ## Reading
 
-- Ranking works. On WikiQA, which no scorer here was trained on, DecisionGator matches the dedicated rerankers. The "answers the question" phrasing is best; `choose_p` adds nothing over it and cannot give an absolute score.
-- The MS MARCO gap is partly unfair. MiniLM was trained on MS MARCO and bge-reranker's training data includes it, as far as we know. Reading the 57 questions where bge's top passage was labeled relevant and DecisionGator's was not, many of DecisionGator's picks also answer the question (near-duplicates, other sources giving the same answer). Some are real misses: a passage about Napoleonic armies in general ranked above one with the numbers asked for.
+- Ranking works. On WikiQA, which none of these models was trained on as far as we know, DecisionGator matches the dedicated rerankers. The "answers the question" phrasing is best; `choose_p` adds nothing over it and cannot give an absolute score.
+- The MS MARCO gap is partly unfair. MiniLM was trained on MS MARCO and bge-reranker's training data includes it, as far as we know. In 57 questions bge's top passage was labeled relevant and DecisionGator's was not. In a sample of five of them, three of DecisionGator's picks also answer the question (near-duplicates, other sources giving the same answer). Some are real misses: a passage about Napoleonic armies in general ranked above one with the numbers asked for.
 - The probability is not usable as an absolute relevance cutoff. The model says yes to passages on the right topic that do not answer the question. This is the clearest thing training could fix, with pairs of on-topic passages that do and do not answer.
 - It is 15 to 80 times slower than the rerankers and about 60 times larger than MiniLM. Reranking 20 chunks costs 3 to 5 seconds on the M1 Pro.
 
