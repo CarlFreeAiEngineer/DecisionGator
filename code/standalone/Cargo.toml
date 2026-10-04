@@ -1,0 +1,34 @@
+# One-file DecisionGator: the same library (../src/lib.rs) with the model,
+# tokenizer, and manifest compiled in and ONNX Runtime linked statically.
+# Build with: uv run code/build_standalone.py
+[package]
+name = "decisiongator-standalone"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+build = "build.rs"
+
+[lib]
+name = "decisiongator_standalone"
+path = "../src/lib.rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+# Same versions as ../Cargo.toml, but ONNX Runtime comes from ort's prebuilt
+# static libraries instead of being loaded from onnxruntime.dll at run time.
+ort = { version = "=2.0.0-rc.10", default-features = false, features = ["std", "download-binaries"] }
+tokenizers = { version = "0.21", default-features = false, features = ["onig"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+
+[build-dependencies]
+serde_json = "1"
+sha2 = "0.10"
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(dg_embedded)"] }
+
+[profile.release]
+lto = "thin"
+strip = true

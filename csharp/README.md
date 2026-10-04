@@ -20,6 +20,8 @@ The library, model, tokenizer, and manifest are one folder per platform, fetched
 3. A `decisiongator` folder next to the application.
 4. The application folder itself.
 
+In each place it first looks for the one-file library, `decisiongator_standalone.dll` (or `libdecisiongator_standalone.so` / `.dylib`), which has the model built in; see [code/standalone](../code/standalone/README.md). With that file next to your executable there is nothing else to copy.
+
 For deployment, copy the whole bundle folder into a `decisiongator` directory next to your executable and nothing needs configuring. The library is loaded by absolute path so it can find its model files beside itself.
 
 ## API

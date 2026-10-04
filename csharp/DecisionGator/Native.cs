@@ -39,10 +39,17 @@ internal static unsafe class Native
         string file = OperatingSystem.IsWindows() ? "decisiongator.dll"
                     : OperatingSystem.IsMacOS() ? "libdecisiongator.dylib"
                     : "libdecisiongator.so";
+        // The one-file build (code/standalone) has the model inside and a different name.
+        string standalone = OperatingSystem.IsWindows() ? "decisiongator_standalone.dll"
+                          : OperatingSystem.IsMacOS() ? "libdecisiongator_standalone.dylib"
+                          : "libdecisiongator_standalone.so";
         foreach (string directory in Bundle.Candidates())
         {
-            string full = Path.Combine(directory, file);
-            if (File.Exists(full)) return NativeLibrary.Load(full);
+            foreach (string candidate in new[] { standalone, file })
+            {
+                string full = Path.Combine(directory, candidate);
+                if (File.Exists(full)) return NativeLibrary.Load(full);
+            }
         }
         throw new DllNotFoundException(
             $"{file} not found. Set DECISIONGATOR_BUNDLE or Bundle.Directory to the bundle folder, " +

@@ -68,6 +68,8 @@ team = teams[choose(
 
 **The same trained weights everywhere.** Native applications and browsers use the same decision data, tokenizer, and rules, with tested agreement between their answers.
 
+Want a single file? A [one-file build](code/standalone/README.md) puts the model and runtime inside the library itself (Windows x64 tested so far).
+
 The component runs on a CPU. Your application needs no separate runner or GPU setup. See [release bundles](released/README.md) for packaging details.
 
 The same call, from whatever you already write in:

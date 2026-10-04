@@ -4,6 +4,7 @@
 
 # Rust build output.
 /code/target/
+/code/standalone/target/
 
 # Python environments and bytecode.
 .venv/

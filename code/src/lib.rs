@@ -71,6 +71,7 @@ extern "C" fn release_environment_at_exit() {
 }
 
 #[cfg(unix)]
+#[cfg_attr(dg_embedded, allow(dead_code))]
 fn component_directory() -> Result<PathBuf> {
     use std::ffi::{c_void, CStr};
     use std::os::unix::ffi::OsStrExt;
@@ -111,6 +112,7 @@ fn component_directory() -> Result<PathBuf> {
 }
 
 #[cfg(target_os = "windows")]
+#[cfg_attr(dg_embedded, allow(dead_code))]
 fn component_directory() -> Result<PathBuf> {
     use std::ffi::{c_void, OsString};
     use std::os::windows::ffi::OsStringExt;
@@ -139,6 +141,7 @@ fn component_directory() -> Result<PathBuf> {
 }
 
 #[cfg(not(any(unix, target_os = "windows")))]
+#[cfg_attr(dg_embedded, allow(dead_code))]
 fn component_directory() -> Result<PathBuf> {
     Err(failure(
         INCOMPATIBLE,
@@ -185,12 +188,17 @@ fn with_default_model<T>(operation: impl FnOnce(&GateSession) -> Result<T>) -> R
     let mut model = DEFAULT_MODEL
         .lock()
         .map_err(|_| failure(INTERNAL, "default model lock poisoned"))?;
+    // Assign only after success: failed loads may be retried next call.
+    #[cfg(dg_embedded)]
+    if model.is_none() {
+        *model = Some(load_embedded()?);
+    }
+    #[cfg(not(dg_embedded))]
     if model.is_none() {
         let directory = component_directory()?;
         let directory = directory
             .to_str()
             .ok_or_else(|| failure(INVALID, "component path is not UTF-8"))?;
-        // Assign only after success: failed loads may be retried next call.
         *model = Some(load(directory)?);
     }
     operation(
@@ -507,9 +515,84 @@ fn load(directory: &str) -> Result<GateSession> {
         .map_err(|e| failure(LOAD, e))?;
     let metadata =
         fs::read_to_string(directory.join("manifest.json")).map_err(|e| failure(LOAD, e))?;
+    let manifest = parse_manifest(&metadata)?;
+    for filename in ["model.onnx", "tokenizer.json"] {
+        let expected = manifest
+            .sha256
+            .get(filename)
+            .ok_or_else(|| failure(INCOMPATIBLE, format!("missing hash: {filename}")))?;
+        if &digest(&directory.join(filename))? != expected {
+            return Err(failure(INCOMPATIBLE, format!("hash mismatch: {filename}")));
+        }
+    }
+    let tokenizer =
+        Tokenizer::from_file(directory.join("tokenizer.json")).map_err(|e| failure(LOAD, e))?;
+    start_runtime(&directory, &manifest)?;
+    let session = session_builder()?
+        .commit_from_file(directory.join("model.onnx"))
+        .map_err(|e| failure(LOAD, e))?;
+    finish(metadata, manifest, tokenizer, session)
+}
+
+// The standalone build (code/standalone) compiles this file with the bundle's
+// manifest, tokenizer, and model inside the library and ONNX Runtime linked in.
+// Its build script checks the embedded files against the manifest's hashes.
+// The model goes in through the assembler's .incbin: include_bytes! on a
+// 600 MB file makes the compiler run out of memory.
+#[cfg(dg_embedded)]
+std::arch::global_asm!(
+    #[cfg(target_os = "windows")]
+    ".section .rdata$dgmodel,\"dr\"",
+    #[cfg(target_os = "macos")]
+    ".section __TEXT,__const",
+    #[cfg(not(any(target_os = "windows", target_os = "macos")))]
+    ".section .rodata.dgmodel,\"a\"",
+    ".balign 64",
+    #[cfg(target_os = "macos")]
+    "_dg_model_start:",
+    #[cfg(not(target_os = "macos"))]
+    "dg_model_start:",
+    concat!(".incbin \"", env!("DG_EMBED_DIR"), "/model.onnx\""),
+    #[cfg(target_os = "macos")]
+    "_dg_model_end:",
+    #[cfg(not(target_os = "macos"))]
+    "dg_model_end:",
+    #[cfg(target_os = "macos")]
+    ".private_extern _dg_model_start, _dg_model_end",
+    #[cfg(not(any(target_os = "windows", target_os = "macos")))]
+    ".hidden dg_model_start, dg_model_end",
+    #[cfg(not(target_os = "macos"))]
+    ".globl dg_model_start, dg_model_end",
+    #[cfg(target_os = "macos")]
+    ".globl _dg_model_start, _dg_model_end",
+);
+
+#[cfg(dg_embedded)]
+fn load_embedded() -> Result<GateSession> {
+    extern "C" {
+        static dg_model_start: u8;
+        static dg_model_end: u8;
+    }
+    static MANIFEST: &str = include_str!(concat!(env!("DG_EMBED_DIR"), "/manifest.json"));
+    static TOKENIZER: &[u8] = include_bytes!(concat!(env!("DG_EMBED_DIR"), "/tokenizer.json"));
+    let model = unsafe {
+        let start = ptr::addr_of!(dg_model_start);
+        let end = ptr::addr_of!(dg_model_end);
+        slice::from_raw_parts(start, end as usize - start as usize)
+    };
+    let manifest = parse_manifest(MANIFEST)?;
+    let tokenizer = Tokenizer::from_bytes(TOKENIZER).map_err(|e| failure(LOAD, e))?;
+    start_runtime(Path::new(""), &manifest)?;
+    let session = session_builder()?
+        .commit_from_memory(model)
+        .map_err(|e| failure(LOAD, e))?;
+    finish(MANIFEST.to_string(), manifest, tokenizer, session)
+}
+
+fn parse_manifest(metadata: &str) -> Result<Manifest> {
     let manifest: Manifest =
-        serde_json::from_str(&metadata).map_err(|e| failure(INCOMPATIBLE, e))?;
-    let template = Template::from_version(manifest.template_version)?;
+        serde_json::from_str(metadata).map_err(|e| failure(INCOMPATIBLE, e))?;
+    Template::from_version(manifest.template_version)?;
     if manifest.choice_template_version != 1 {
         return Err(failure(INCOMPATIBLE, "unsupported choice template version"));
     }
@@ -522,21 +605,12 @@ fn load(directory: &str) -> Result<GateSession> {
     {
         return Err(failure(INCOMPATIBLE, "unsupported manifest"));
     }
-    for filename in ["model.onnx", "tokenizer.json"] {
-        let expected = manifest
-            .sha256
-            .get(filename)
-            .ok_or_else(|| failure(INCOMPATIBLE, format!("missing hash: {filename}")))?;
-        if &digest(&directory.join(filename))? != expected {
-            return Err(failure(INCOMPATIBLE, format!("hash mismatch: {filename}")));
-        }
-    }
-    let mut tokenizer =
-        Tokenizer::from_file(directory.join("tokenizer.json")).map_err(|e| failure(LOAD, e))?;
-    tokenizer
-        .with_truncation(None)
-        .map_err(|e| failure(INCOMPATIBLE, e))?;
-    tokenizer.with_padding(None);
+    Ok(manifest)
+}
+
+/// Initialize ONNX Runtime once per process from the bundle's verified library.
+#[cfg(not(dg_embedded))]
+fn start_runtime(directory: &Path, manifest: &Manifest) -> Result<()> {
     let runtime_name = if cfg!(target_os = "macos") {
         "libonnxruntime.dylib"
     } else if cfg!(target_os = "windows") {
@@ -556,46 +630,77 @@ fn load(directory: &str) -> Result<GateSession> {
     if expected != &runtime_hash {
         return Err(failure(INCOMPATIBLE, "runtime hash mismatch"));
     }
+    let runtime_path = runtime
+        .to_str()
+        .ok_or_else(|| failure(INVALID, "runtime path is not UTF-8"))?;
+    initialize_runtime(runtime_hash, || {
+        ort::init_from(runtime_path)
+            .with_name("DecisionGator")
+            .with_telemetry(false)
+            .commit()
+            .map(|_| ())
+            .map_err(|e| failure(LOAD, e))
+    })
+}
+
+/// The standalone library links ONNX Runtime in, so there is nothing to locate.
+#[cfg(dg_embedded)]
+fn start_runtime(_directory: &Path, _manifest: &Manifest) -> Result<()> {
+    initialize_runtime("linked".to_string(), || {
+        ort::init()
+            .with_name("DecisionGator")
+            .with_telemetry(false)
+            .commit()
+            .map(|_| ())
+            .map_err(|e| failure(LOAD, e))
+    })
+}
+
+fn initialize_runtime(identity: String, init: impl FnOnce() -> Result<()>) -> Result<()> {
+    let mut initialized = RUNTIME
+        .lock()
+        .map_err(|_| failure(INTERNAL, "runtime lock poisoned"))?;
+    if let Some(existing) = initialized.as_ref() {
+        if existing != &identity {
+            return Err(failure(
+                INCOMPATIBLE,
+                "a different ONNX Runtime is already loaded in this process",
+            ));
+        }
+        return Ok(());
+    }
+    init()?;
+    #[cfg(unix)]
     {
-        let mut initialized = RUNTIME
-            .lock()
-            .map_err(|_| failure(INTERNAL, "runtime lock poisoned"))?;
-        if let Some(existing) = initialized.as_ref() {
-            if existing != &runtime_hash {
-                return Err(failure(
-                    INCOMPATIBLE,
-                    "a different ONNX Runtime is already loaded in this process",
-                ));
-            }
-        } else {
-            let runtime_path = runtime
-                .to_str()
-                .ok_or_else(|| failure(INVALID, "runtime path is not UTF-8"))?;
-            ort::init_from(runtime_path)
-                .with_name("DecisionGator")
-                .with_telemetry(false)
-                .commit()
-                .map_err(|e| failure(LOAD, e))?;
-            #[cfg(unix)]
-            {
-                let environment =
-                    ort::environment::get_environment().map_err(|e| failure(LOAD, e))?;
-                EXIT_ENVIRONMENT.store(environment.ptr().cast_mut(), Ordering::SeqCst);
-                if unsafe { atexit(release_environment_at_exit) } != 0 {
-                    return Err(failure(RESOURCE, "could not register runtime shutdown"));
-                }
-            }
-            *initialized = Some(runtime_hash);
+        let environment = ort::environment::get_environment().map_err(|e| failure(LOAD, e))?;
+        EXIT_ENVIRONMENT.store(environment.ptr().cast_mut(), Ordering::SeqCst);
+        if unsafe { atexit(release_environment_at_exit) } != 0 {
+            return Err(failure(RESOURCE, "could not register runtime shutdown"));
         }
     }
-    let session = Session::builder()
+    *initialized = Some(identity);
+    Ok(())
+}
+
+fn session_builder() -> Result<ort::session::builder::SessionBuilder> {
+    Session::builder()
         .map_err(|e| failure(LOAD, e))?
         .with_intra_threads(inference_threads())
         .map_err(|e| failure(RESOURCE, e))?
         .with_inter_threads(1)
-        .map_err(|e| failure(RESOURCE, e))?
-        .commit_from_file(directory.join("model.onnx"))
-        .map_err(|e| failure(LOAD, e))?;
+        .map_err(|e| failure(RESOURCE, e))
+}
+
+fn finish(
+    metadata: String,
+    manifest: Manifest,
+    mut tokenizer: Tokenizer,
+    session: Session,
+) -> Result<GateSession> {
+    tokenizer
+        .with_truncation(None)
+        .map_err(|e| failure(INCOMPATIBLE, e))?;
+    tokenizer.with_padding(None);
     let input_names: Vec<_> = session
         .inputs
         .iter()
@@ -614,7 +719,7 @@ fn load(directory: &str) -> Result<GateSession> {
         session: Mutex::new(session),
         tokenizer,
         max_tokens: manifest.max_tokens,
-        template,
+        template: Template::from_version(manifest.template_version)?,
         temperature: manifest.temperature,
         choice_template: manifest.choice_template_version,
         metadata,

@@ -17,3 +17,7 @@ sha2 = "0.10"
 [profile.release]
 lto = "thin"
 strip = true
+
+# Set only by the standalone build in code/standalone.
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(dg_embedded)"] }
