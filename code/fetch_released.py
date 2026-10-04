@@ -103,7 +103,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--version', default=DEFAULT_VERSION, help=f'release version to fetch (default {DEFAULT_VERSION})')
     parser.add_argument('--only', action='append', default=[], metavar='DIR',
-                        help='top-level bundle directory to fetch: macos-arm64, linux-x64, windows-x64, web, python, java, node; repeatable')
+                        help='top-level bundle directory to fetch: macos-arm64, linux-x64, windows-x64, standalone-windows-x64 (one-file library), web, python, java, node; repeatable')
     parser.add_argument('--for', dest='language', choices=LANGUAGES,
                         help='fetch only what that language\'s example in examples/ needs on this computer')
     parser.add_argument('--output', type=Path, default=ROOT / 'released', help='destination directory (default released/)')

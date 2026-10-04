@@ -12,6 +12,10 @@ Compared with the normal bundle:
 - `dg_load` still loads a separate bundle folder, using the ONNX Runtime built into the library.
 - Windows: needs the Microsoft Visual C++ 2015–2022 x64 Redistributable (`winget install --id Microsoft.VCRedist.2015+.x64 --exact`) and Windows 10 version 1903 or newer, because the built-in ONNX Runtime links to `DirectML.dll`, which ships with Windows from that version on.
 
+## Getting it
+
+The Windows x64 build is published with the other release files: `uv run code/fetch_released.py --only standalone-windows-x64` puts it in `released/standalone-windows-x64/`.
+
 ## Building it
 
 ```text
