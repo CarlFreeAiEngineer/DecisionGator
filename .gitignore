@@ -36,3 +36,6 @@ __pycache__/
 !/released/**/*.json
 /csharp/**/bin/
 /csharp/**/obj/
+
+# Local live-demo folder; holds the 600 MB native bundle.
+/demo.tmp/
