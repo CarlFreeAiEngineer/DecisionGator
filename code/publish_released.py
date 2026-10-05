@@ -93,6 +93,9 @@ def main():
         command.append('--dry-run')
     command += [f'{args.source}/', destination]
     subprocess.run(command, check=True)
+    if not args.dry_run:
+        # --chmod does not fix files that were already on the server unchanged; unreadable ones give users a 403
+        subprocess.run(['ssh', args.host, f'chmod -R a+rX {args.remote_dir}/{args.version}'], check=True)
     print(f'published {args.version} to https://62-84-178-253.sslip.io/DecisionGator/files/{args.version}/')
     if args.site:
         publish_site(args.host, args.remote_dir, args.dry_run)

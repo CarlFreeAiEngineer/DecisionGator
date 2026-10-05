@@ -14,7 +14,7 @@ ticket = "Our whole warehouse can't print shipping labels and trucks leave in an
 question = "Is the customer describing an urgent problem?"
 
 # A yes/no decision at the usual 0.5 cutoff.
-print("urgent:", is_yes(ticket, question))
+print("urgent:", str(is_yes(ticket, question)).lower())
 
 # The probability, so you can keep an uncertain range for a person.
 print(f"p_yes = {is_yes_p(ticket, question):.3f}")
@@ -22,7 +22,7 @@ print(f"p_yes = {is_yes_p(ticket, question):.3f}")
 # Criteria and a stricter threshold.
 criteria = {"yes": "Work is blocked and there is a deadline within hours.",
             "no": "The problem is an inconvenience with no near deadline."}
-print("confident urgent:", is_yes(ticket, question, criteria, threshold=0.90))
+print("confident urgent:", str(is_yes(ticket, question, criteria, threshold=0.90)).lower())
 
 # Several options instead of yes or no.
 teams = ["billing", "technical support", "sales"]
