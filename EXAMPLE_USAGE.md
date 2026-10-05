@@ -504,4 +504,4 @@ Strings are borrowed for the duration of each call only. `ChooseP` copies the op
 
 ## Choosing a threshold
 
-The default cutoff of 0.5 is a starting point, not a measured optimum. Collect a few dozen real examples from your application, run `is_yes_p` on them, and pick the cutoff that gives the mistakes you can tolerate. If it gets an example wrong, that example is training data: see [What if this gives a wrong answer?](README.md#what-if-this-gives-a-wrong-answer).
+The default cutoff of 0.5 is a starting point, not a measured optimum. Collect a few dozen real examples from your application, run `is_yes_p` on them, and pick the cutoff that gives the mistakes you can tolerate. If it gets an example wrong, that example is training data: see [What to do when DecisionGator gives you a wrong answer](WRONG-ANSWER.md).

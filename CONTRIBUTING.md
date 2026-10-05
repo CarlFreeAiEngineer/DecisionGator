@@ -14,39 +14,31 @@ The prebuilt bundles are too large for GitHub, so they are downloaded from `http
 
 ## 2. Record the wrong answer
 
-Copy [data/contributions/example-correction.jsonl](data/contributions/example-correction.jsonl) to a new file under `data/contributions/` and edit it. Each line is one example with the content, the question, optional criteria, the correct label, and a one-sentence rationale. Use only text you have the right to publish; never paste real customer data. The [data guide](data/README.md) explains every field.
+Add one line per example to [data/corrections.jsonl](data/corrections.jsonl): the text, the question, and the right answer, plus the options for a multiple-choice question. [WRONG-ANSWER.md](WRONG-ANSWER.md) explains every field, with examples. Use only text you have the right to publish; never paste real customer data.
 
 Check it:
 
 ```text
-uv run --locked decisiongator-train validate --extra-data data/contributions/my-fix.jsonl
+uv run training/retrain.py --check-only
 ```
 
-## 3. Retrain locally
+## 3. Retrain (optional)
 
-Start from the current release checkpoint and add your file. Training runs on an ordinary laptop CPU; the recipe and timings are in [the v0.3 report](reports/accuracy-v3.md).
+You do not need to retrain to contribute examples. To build and test a model with your corrections, open [the retraining notebook](https://colab.research.google.com/github/CarlFreeAiEngineer/DecisionGator/blob/main/colab/retrain.ipynb) on a paid Colab A100, or on a Linux machine with an NVIDIA GPU of 40 GB or more run:
 
 ```text
-uv run --locked decisiongator-train train \
-  --base cross-encoder/nli-MiniLM2-L6-H768 --revision b95119ce93d3e065de6214e38cd4a97b0f2f2c6d \
-  --nli-head --template 2 --learning-rate 1e-5 --epochs 10 \
-  --extra-data data/expansion-v2.jsonl --extra-data data/choices.jsonl \
-  --extra-data data/contributions/my-fix.jsonl \
-  --output runs/my-fix
-uv run --locked decisiongator-train export --checkpoint runs/my-fix/best --output models/my-fix --model-id my-fix
-uv run --locked decisiongator-train calibrate --bundle models/my-fix --extra-data data/expansion-v2.jsonl --extra-data data/choices.jsonl --output reports/my-fix-calibration.json
-uv run --locked decisiongator-train evaluate --bundle models/my-fix --data data/evaluation-v2.jsonl --split test --output reports/my-fix-test.json
+uv run training/retrain.py
 ```
 
-Then build a native bundle for your platform and use it from your language of choice; see [native builds](code/README.md). Point `DECISIONGATOR_BUNDLE` at the new bundle to test it without replacing the release.
+It retrains with the released model's exact recipe plus your corrections, then reports every held-out test score next to the released model's. Its output is `model.onnx`, `tokenizer.json` and `manifest.json`, which replace the files in a bundle folder; see [WRONG-ANSWER.md](WRONG-ANSWER.md#use-your-new-model). The individual steps it runs (`decisiongator-train train`, `export`, `calibrate`, `evaluate`) are in [training/pipeline.py](training/pipeline.py) for anyone who wants to change the recipe.
 
 You can stop here and ship your private variant. Nothing is uploaded anywhere.
 
 ## 4. Send the examples back
 
-Open a pull request that adds your `data/contributions/*.jsonl` file and a short `.md` note beside it saying where the examples came from and what they fix. Include the before and after numbers from the evaluate step if you have them. Do not include trained weights or bundles in the pull request; maintainers retrain from the merged data, run the release checks, and publish new bundles with `code/publish_released.py`.
+Open a pull request that adds your lines to `data/corrections.jsonl`, and say in the description where the examples came from and what they fix. Include the results table from `retrain.py` if you ran it. Do not include trained weights or bundles in the pull request; maintainers retrain from the merged data, run the release checks, and publish new bundles with `code/publish_released.py`.
 
-Reviewers check the rights statement, the question wording, the label, and whether the new examples overlap the evaluation sets. A correction that helps one family but hurts another is still welcome; just report both.
+Reviewers check that the text is yours to share, the question wording, the label, and whether the new examples overlap the evaluation sets. A correction that helps one family but hurts another is still welcome; just report both.
 
 ## Code changes
 

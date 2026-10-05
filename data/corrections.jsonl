@@ -1,0 +1,2 @@
+{"text": "i am a former employee. just wondering when my last check will arrive", "question": "Which department should handle this message?", "options": ["BILLING", "TECH SUPPORT", "SALES", "HR"], "answer": "HR", "why": "Pay owed to a former employee is handled by HR, not customer billing."}
+{"text": "Do you have an ai product?", "question": "Which department should handle this message?", "options": ["BILLING", "TECH SUPPORT", "SALES", "HR"], "answer": "SALES", "why": "Asking what a company sells is a sales question; nothing is broken."}

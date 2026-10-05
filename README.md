@@ -155,7 +155,7 @@ Every row below can answer "is this person asking for an appointment?" The diffe
 
 | | Setup | The answer comes back as | Offline | Wrong answer? |
 | --- | --- | --- | --- | --- |
-| **DecisionGator** | Add a library | A boolean | Yes | Add data, retrain |
+| **DecisionGator** | Add a library | A boolean | Yes | [Add data, retrain](WRONG-ANSWER.md) |
 | **Jev** (TypeSafe AI) | API key, waitlist, network | Typed answer + probability | No | Can't; it's hosted |
 | **Laya** (Convai Innovations) | Python package, PyTorch | Typed answer + probability | Yes | Fine-tune in a notebook |
 | **Regex / keywords** | None | A boolean, for cases you thought of | Yes | Add a pattern, break another |
@@ -184,15 +184,17 @@ What the table hides:
 
 **That means you can add training data, retrain the model yourself easily right here in this project, and contribute your training data to the project so the whole world can benefit!**
 
-A wrong answer from a closed API is a dead end: you file a ticket and hope. A wrong answer here is an improvement you can make yourself. Write down the text, the question, and the right answer, add them to the training data, and retrain. The training data is plain text files in this repository, and the training recipe runs on an ordinary laptop. Keep the improved model for yourself, or send your examples back in a pull request and the next release gets better for everyone.
+**👉 [What to do when DecisionGator gives you a wrong answer](WRONG-ANSWER.md)**
+
+A wrong answer from a closed API is a dead end: you file a ticket and hope. A wrong answer here is an improvement you can make yourself:
+
+1. **Write it down.** Add one line to [`data/corrections.jsonl`](data/corrections.jsonl): the text, the question, and the right answer. That is the only file you edit.
+2. **Retrain.** Open [the retraining notebook](https://colab.research.google.com/github/CarlFreeAiEngineer/DecisionGator/blob/main/colab/retrain.ipynb) on a paid Google Colab A100 and run all cells, or run `uv run training/retrain.py` on your own machine with a large NVIDIA GPU. About half an hour later you download a new model, with a table showing every test score next to the released model's.
+3. **Share it.** Send your new lines in a pull request and the next release gets better for everyone.
 
 **Open weights. Open training data. Open recipes.**
 
-1. **Catch a mistake.** Save the content and question, supply the correct answer, and explain why.
-2. **Teach your own copy.** Clone the repository, add your examples, and [retrain and test](specs/accuracy-v2.md) a version you can ship.
-3. **Share the improvement.** Submit examples through a normal Git pull request. Reviewed contributions improve the shared training data; tested improvements become new releases. The step-by-step version is in [CONTRIBUTING.md](CONTRIBUTING.md).
-
-You need neither a GPU nor machine-learning expertise to contribute an example. You can also retrain privately without sharing your data. A correction is useful evidence, not a guaranteed fix: evaluation checks whether it helps without breaking earlier decisions.
+You need no GPU and no machine-learning expertise to contribute an example; only retraining needs the GPU. You can also retrain privately without sharing your data. A correction is useful evidence, not a guaranteed fix: the test scores show whether it helped without breaking anything else.
 
 We intend to publish releases and training assets, likely on Hugging Face alongside this repository. Our training data is open; that does not mean we possess the upstream pretraining corpus. See [contribution and training details](specs/open-training.md).
 

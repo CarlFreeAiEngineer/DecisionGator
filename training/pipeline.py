@@ -80,7 +80,7 @@ def choice_metrics(children, probabilities):
 def read_data(paths):
     rows, ids, groups, examples = [], set(), {}, set()
     for path in paths:
-        for line_number, line in enumerate(Path(path).read_text().splitlines(), 1):
+        for line_number, line in enumerate(Path(path).read_text(encoding='utf-8').splitlines(), 1):
             if not line.strip():
                 continue
             row = json.loads(line)

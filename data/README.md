@@ -1,5 +1,7 @@
 # Open seed data
 
+**Found a wrong answer?** Add it to [corrections.jsonl](corrections.jsonl), the one file meant for hand-written fixes; [WRONG-ANSWER.md](../WRONG-ANSWER.md) explains the format and how to retrain. `training/retrain.py` always trains on it. The rest of this page describes the project's own training data.
+
 Version 0.4.0 trains on everything below plus [data/v4](v4/README.md): 3,526 newly authored records in sixteen families and a separate 480-case held-out test. See [the v0.4 report](../reports/accuracy-v4.md).
 
 The current v0.2 recipe also explicitly loads [expansion-v2.jsonl](expansion-v2.jsonl), bringing training/validation/calibration counts to 404/96/52. [evaluation-v2.jsonl](evaluation-v2.jsonl) is a separate frozen 80-example test, never training input. See [the current recipe](../specs/accuracy-v2.md). All these records remain synthetic and unreviewed.
