@@ -1,6 +1,6 @@
 # Native builds
 
-Build on each target machine: Mac arm64, Windows x64 with MSVC, or Linux x64 with glibc. The build helper refuses other hosts and toolchains. A successful Mac build does not establish Windows or Linux compatibility.
+A Mac can build all three native bundles (Mac arm64, Linux x64 with glibc, Windows x64); see [Build all three on a Mac](#build-all-three-on-a-mac). Linux and Windows machines can build only their own bundle. Either way, each bundle's checks must run on its own platform: a bundle built on a Mac for another platform stays marked pending until `tests/target_check.py` passes there.
 
 Use an existing exported model directory containing `manifest.json`, `model.onnx`, and `tokenizer.json`. Training and PyTorch are unnecessary on build machines. The build verifies both asset hashes before compiling.
 
@@ -24,6 +24,31 @@ uv run code/setup.py --rust-from PATH_TO_TOOLCHAIN
 ```
 
 The directory must contain `bin/rustc` and `bin/cargo` (`.exe` on Windows). Existing project tools are never overwritten. Downloaded tools and Cargo crates stay under `tools/`.
+
+## Build all three on a Mac
+
+Once per checkout, after `uv run code/setup.py`, install Homebrew LLVM and the cross tools:
+
+```text
+brew install llvm@22
+uv run code/setup-cross-tools.py
+```
+
+This adds the Rust standard libraries for Linux and Windows, Zig with cargo-zigbuild (the C compiler and linker for Linux), cargo-xwin (Visual Studio-style Windows DLLs), and ONNX Runtime 1.22.1 for Linux and Windows taken from the official Python wheels, all under `tools/`. LLVM's `clang-cl` and `llvm-lib` compile the tokenizer's C code for Windows. On first use cargo-xwin downloads Microsoft's C runtime and Windows SDK libraries (about 1 GB) into `tools/xwin`; using them means accepting Microsoft's license terms.
+
+```text
+uv run --python 3.12 --with onnxruntime==1.22.1 code/build.py --model MODEL_DIRECTORY --output released/macos-arm64
+uv run code/build.py --target linux-x64 --model MODEL_DIRECTORY --output released/linux-x64
+uv run code/build.py --target windows-x64 --model MODEL_DIRECTORY --output released/windows-x64
+```
+
+Each cross build takes about a minute. It runs the Rust unit tests on the Mac, builds the library and a C smoke program for the target, records dependencies with LLVM's readers, and writes `build-checks.json` with status `pending`. The Linux library targets glibc 2.28 and has a soname, so the smoke program finds it through `$ORIGIN`. Then, on a machine of that platform with a checkout of this repository and `uv` (no compiler needed), copy the bundle over and run:
+
+```text
+uv run tests/target_check.py --bundle BUNDLE_DIRECTORY
+```
+
+It verifies every file hash, runs the smoke program, the native ABI and Python checks, and the frozen platform comparison when it applies, then marks the bundle passed. Copy the checked `build-checks.json` and `platform-parity.json` back into the Mac's copy of the bundle. For the 0.4.1 model, cross-built Linux and Windows bundles gave exactly the same comparison results as the bundles built on those platforms, since the inference itself runs in the same ONNX Runtime files.
 
 ## Build without training dependencies
 
