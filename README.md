@@ -1,5 +1,13 @@
 # DecisionGator 🐊
 
+## Project status
+
+Keep this section current: at the end of each work session, replace these three lines (don't append). If there is nothing left to do, say so and why, e.g. `none (finished)` or `none (parked: reason)`. `../misc/scripts/rundown.py` collects this section from every project.
+
+- Next step: unknown
+- Waiting on: nothing
+- Last action: 2026-10-31, built Linux and Windows bundles on a Mac and checked them
+
 ## Your software probably needs this.
 
 ## A Jev-like local AI inside a single .dll or .so
