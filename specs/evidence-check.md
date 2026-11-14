@@ -20,7 +20,7 @@ One JSON object per line in `data/evidence/*.jsonl`:
 ```
 
 - `label`: `supported`, `unsupported` or `not_claim`.
-- `kind`: how the record was made, for scoring by kind. For unsupported records: `name`, `number`, `date`, `order`, `speaker`, `added_detail`, `never_told`. For supported ones: `verbatim`, `paraphrase`, `forgetting`. Records from real model replies use `real`.
+- `kind`: how the record was made, for scoring by kind. For unsupported records: `name`, `number`, `date`, `order`, `speaker`, `added_detail`, `never_told`, and for flipped evidence also `removed` (the supporting line deleted). For supported ones: `verbatim`, `paraphrase`, `forgetting`. Records from real model replies use `real`.
 - `group_id`: records that share evidence or a statement share a group, and a group never crosses splits.
 - `split`: `train`, `validation`, `calibration` or `test`.
 
