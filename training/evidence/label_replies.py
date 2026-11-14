@@ -9,14 +9,15 @@ See specs/evidence-check.md. One `claude` call per reply labels every sentence. 
 Resumable: replies already in the output are skipped. Example pilot:
     label_replies.py --runs app-hy3-1 --limit 12 --verdicts wrong,partly
 """
-import argparse, json, os, random, re, shutil, subprocess, sys, threading, time
+import argparse, gzip, json, os, random, re, shutil, subprocess, sys, threading, time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-RUNS = Path(os.environ.get("REALAI_RUNS", "/Users/ace/Desktop/prjx/RealAiDating/evals/memory/runs"))
-OUT = ROOT / "data/evidence/real-replies.jsonl"
+RUNS = Path(os.environ.get("REALAI_RUNS", ROOT.parent / "RealAiDating/evals/memory/runs"))
+# Private: the labeled sentences hold RealAiDating's chat, so they live in that private repository, never here.
+OUT = ROOT.parent / "RealAiDating/evals/memory/evidence-labels/real-replies.jsonl.gz"
 LABEL_MODEL = "sonnet"
 MARK = "# What to write"
 LABELS = ("supported", "unsupported", "not_claim")
@@ -185,7 +186,7 @@ def main():
     a.out.parent.mkdir(parents=True, exist_ok=True)
     done = set()
     if a.out.exists():
-        for line in a.out.read_text("utf-8").splitlines():
+        for line in gzip.open(a.out, "rt", encoding="utf-8"):
             r = json.loads(line)
             done.add((r["run"], r["question"]))
     jobs = []
@@ -210,7 +211,7 @@ def main():
     today = date.today().isoformat()
     print(f"{len(jobs)} replies to label with {a.workers} workers", file=sys.stderr)
     n, failed, t0, recs_all = 0, [], time.time(), []
-    with ThreadPoolExecutor(a.workers) as ex, a.out.open("a", encoding="utf-8") as f:
+    with ThreadPoolExecutor(a.workers) as ex, gzip.open(a.out, "at", encoding="utf-8") as f:
         futs = {ex.submit(load_reply, *j[:4], j[4], j[5], today): j for j in jobs}
         for fu in as_completed(futs):
             j = futs[fu]
@@ -230,7 +231,7 @@ def main():
     print(f"\nSUMMARY: {n} replies done, {len(failed)} skipped (failed) in {time.time() - t0:.0f}s", file=sys.stderr)
     if failed:
         print("skipped (rerun to retry): " + ", ".join(failed), file=sys.stderr)
-    allr = [json.loads(x) for x in a.out.read_text("utf-8").splitlines()] if a.out.exists() else []
+    allr = [json.loads(x) for x in gzip.open(a.out, "rt", encoding="utf-8")] if a.out.exists() else []
     for title, rs in (("this run", recs_all), ("whole file", allr)):
         print(f"{title}: {len(rs)} records; label {dict(Counter(r['label'] for r in rs))}; "
               f"split {dict(Counter(r['split'] for r in rs))}; model {dict(Counter(r['model'] for r in rs))}; "

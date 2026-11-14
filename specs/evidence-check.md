@@ -24,9 +24,13 @@ One JSON object per line in `data/evidence/*.jsonl`:
 - `group_id`: records that share evidence or a statement share a group, and a group never crosses splits.
 - `split`: `train`, `validation`, `calibration` or `test`.
 
+## Private data
+
+The released model is trained on more data than this repository holds. The sentences labeled from RealAiDating's replies contain that project's private chat, so they live in its private repository (`../RealAiDating/evals/memory/evidence-labels/real-replies.jsonl.gz`, written by `training/evidence/label_replies.py`) and never here. Everything else (scripts, invented data, results as numbers) is public. Anyone retraining the evidence check from this repository alone will get a different, probably weaker, model: add a lot of your own labeled examples before retraining it. Never quote a private sentence in a public report; give scores only.
+
 ## Where the records come from
 
-1. **Real replies** from `../RealAiDating/evals/memory/runs/app-*`: about 950 replies to 106 questions by five models. A language model splits each reply into sentences and labels each against the prompt the reply was written from (everything above "# What to write"), using the judge's verdict as a hint. A person checks a sample. All Hy3 replies are the held-out test and are never trained on.
+1. **Real replies (private)** from `../RealAiDating/evals/memory/runs/app-*`: about 950 replies to 106 questions by five models. A language model splits each reply into sentences and labels each against the prompt the reply was written from (everything above "# What to write"), using the judge's verdict as a hint. A person checks a sample. All Hy3 replies are the held-out test and are never trained on.
 2. **Made from the 8-week chat** (`history/week-*.jsonl`, `plan.yaml`): take a true statement and alter a name, a number, a date, the order of two events, who said it, or add a plausible detail.
 3. **Other subjects**, so the model reads the evidence instead of memorizing one chat: other invented people and histories, and source-and-summary pairs.
 
