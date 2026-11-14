@@ -19,6 +19,7 @@ The product goal is general reuse across question types, not a fixed refund dete
 7. [Development and builds](development.md): Rust, portable tools, native builds, and the three release targets.
 8. [Ordinary component interfaces](component-api.md): automatic initialization, simple calls, and Java packaging.
 9. [Node.js and WebAssembly](javascript-and-webassembly.md): implemented bindings, shared weights, browser deployment, and verification.
+10. [Evidence check](evidence-check.md): a second, long-input model that says whether a long text supports a sentence (in progress).
 
 ## Firm requirements
 
