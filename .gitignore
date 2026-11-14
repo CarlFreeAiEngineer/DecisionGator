@@ -40,3 +40,6 @@ __pycache__/
 
 # Local live-demo folder; holds the 600 MB native bundle.
 /*.tmp/
+
+# Sentences labeled from RealAiDating replies: private chat, never published here.
+/data/evidence/real-replies*.jsonl
