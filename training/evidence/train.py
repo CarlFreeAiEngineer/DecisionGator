@@ -230,6 +230,11 @@ def evaluate(rows, logits, temperature=1.0):
         red = redesign_metrics(sub, sub_probs)
         if red:
             m['redesign'] = red
+            # The same, leaving out sentences the labeling model marked borderline (often most real unsupported ones).
+            clear = [(r, p) for r, p in zip(sub, sub_probs) if not r.get('borderline')]
+            red_clear = redesign_metrics([r for r, _ in clear], [p for _, p in clear])
+            if red_clear:
+                m['redesign_clear'] = red_clear
         kinds = {}
         for r, y, p in zip(sub, labels, predicted):
             if r.get('kind') != 'real' and y == 1:
@@ -432,6 +437,13 @@ def train(args):
     metrics = {'best_epoch': best_epoch, 'temperature': temperature, 'history': history, 'final': final,
                'truncation': stats, 'config': config}
     (output / 'metrics.json').write_text(json.dumps(metrics, indent=2) + '\n')
+    # Per-record probabilities for later analysis: ids and numbers only, never record text.
+    with open(output / 'predictions.jsonl', 'w', encoding='utf-8') as f:
+        for s in final:
+            for r, p in zip(by_split[s], torch.softmax(logits[s] / temperature, dim=-1).tolist()):
+                f.write(json.dumps({'id': r['id'], 'split': s, 'source': r['source_file'], 'label': r['label'], 'kind': r.get('kind'),
+                                    'borderline': bool(r.get('borderline')), 'run': r.get('run'), 'question': r.get('question'),
+                                    'probs': [round(x, 4) for x in p]}) + '\n')
     del model
     if args.export:
         export(args, best_dir, output, tokenizer, temperature, by_split, config)
