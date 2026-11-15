@@ -205,6 +205,16 @@ def load_reply(run_dir: Path, q: str, rep: dict, verd: dict, split: str, model: 
     return recs
 
 
+def question_splits():
+    """Questions that are not for training: 10 validation, 10 calibration, and 36 test (no reply to a test question,
+    from any model, is trained on)."""
+    allq = sorted({f"P{n:03d}" for n in range(1, 107)})
+    pick = random.Random(20261114).sample(allq, 20)
+    heldout = {q: ("validation" if i < 10 else "calibration") for i, q in enumerate(pick)}
+    heldout.update({q: "test" for q in random.Random(20261115).sample([q for q in allq if q not in heldout], 36)})
+    return heldout
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--runs", nargs="*", help="run folder names (default: every app-<model>-<n>)")
@@ -221,11 +231,7 @@ def main():
     if not RUNS.is_dir():
         sys.exit(f"error: run folders not found at {RUNS} (set REALAI_RUNS)")
     names = a.runs or sorted(p.name for p in RUNS.iterdir() if re.fullmatch(r"app-[a-z0-9]+-\d+", p.name))
-    allq = sorted({f"P{n:03d}" for n in range(1, 107)})
-    pick = random.Random(20261114).sample(allq, 20)
-    heldout = {q: ("validation" if i < 10 else "calibration") for i, q in enumerate(pick)}
-    # 36 more questions are test only: no reply to them, from any model, is trained on (see specs/evidence-check.md).
-    heldout.update({q: "test" for q in random.Random(20261115).sample([q for q in allq if q not in heldout], 36)})
+    heldout = question_splits()
     want = set(a.verdicts.split(",")) if a.verdicts else None
     a.out.parent.mkdir(parents=True, exist_ok=True)
     done = set()

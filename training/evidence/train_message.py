@@ -39,7 +39,7 @@ def mark_scope(rows):
     n = 0
     for r in rows:
         told_wrong = r['label'] == 'unsupported' and (r.get('type') != 'new' if r.get('kind') == 'real' else r.get('kind') not in NEW_KINDS)
-        r['ignore'] = bool(r.get('borderline') or told_wrong)
+        r['ignore'] = bool(r.get('borderline') or told_wrong or r.get('unlabeled'))
         n += r['ignore']
     return n
 
@@ -49,7 +49,7 @@ def sort_key(item):
     return (r.get('sentence_index') if r.get('sentence_index') is not None else position, position)
 
 
-def build_messages(rows):
+def build_messages(rows, keep_unlabeled=False):
     """Group sentence records into messages. Returns a list of dicts:
     {'id', 'split', 'source_file', 'evidence', 'sentences': [(text, record or None)]}  (None = context only, no label).
     A reply is (group_id, run, question, context). Ordinary records of a reply with the same evidence form
@@ -69,7 +69,7 @@ def build_messages(rows):
     for r in rows:
         if is_flip(r):
             continue
-        m = messages.setdefault((reply_key(r), r['evidence'], None), {'evidence': r['evidence'], 'sentences': []})
+        m = messages.setdefault((reply_key(r), r['evidence'], None), {'evidence': r['evidence'], 'sentences': [], 'any': r})
         m['sentences'].append((r['statement'], None if r.get('ignore') else r))
     for r in rows:
         if not is_flip(r) or r.get('ignore'):
@@ -90,10 +90,11 @@ def build_messages(rows):
     out = []
     for m in messages.values():
         labeled = [r for _, r in m['sentences'] if r is not None]
-        if not labeled:
+        first = labeled[0] if labeled else m.get('any') if keep_unlabeled else None
+        if first is None or (not labeled and first['split'] != 'train'):  # unlabeled messages only teach (see --teacher)
             continue
-        m.pop('origins', None)
-        m['id'], m['split'], m['source_file'] = labeled[0]['id'], labeled[0]['split'], labeled[0]['source_file']
+        m.pop('origins', None); m.pop('any', None)
+        m['id'], m['split'], m['source_file'] = first['id'], first['split'], first['source_file']
         out.append(m)
     return out
 
@@ -170,6 +171,23 @@ def collate_messages(batch, pad_id, device):
     return ids, mask, pos.to(device), targets.to(device)
 
 
+def teacher_probabilities(teacher_dir, messages, device, pad_id, tokens_per_batch, autocast, temperature):
+    """Set m['soft'] = [markers, 3] probabilities from a trained model, for every sentence of every message."""
+    import torch
+    from transformers import AutoModelForSequenceClassification
+    teacher = AutoModelForSequenceClassification.from_pretrained(teacher_dir).to(device).eval()
+    with torch.no_grad():
+        for batch in T.make_batches(messages, tokens_per_batch, random.Random(0), shuffle=False):
+            ids, mask, pos, _ = collate_messages(batch, pad_id, device)
+            with torch.autocast('cuda', dtype=torch.bfloat16, enabled=autocast):
+                probs = torch.softmax(message_logits(teacher, ids, mask, pos).float() / temperature, dim=-1).cpu()
+            for m, p in zip(batch, probs):
+                m['soft'] = p[:len(m['positions'])]
+    del teacher
+    if device == 'cuda':
+        torch.cuda.empty_cache()
+
+
 # ---------------------------------------------------------------- model
 
 def message_logits(model, ids, mask, pos):
@@ -223,7 +241,7 @@ def train(args):
         T.apply_relabels(rows, args.relabel)
     if args.only_new_information:
         print('ignored (borderline or told wrong):', mark_scope(rows), 'of', len(rows), flush=True)
-    messages = build_messages(rows)
+    messages = build_messages(rows, keep_unlabeled=bool(args.teacher))
     stats_by_source = message_stats(messages)
     print('messages (counts):', json.dumps(stats_by_source), flush=True)
     if args.stats:
@@ -266,6 +284,11 @@ def train(args):
     class_weights = T.parse_class_weights(args.class_weight)
     class_tensor = torch.tensor([class_weights.get(l, 1.0) for l in LABELS], device=device) if class_weights else None
 
+    if args.teacher:
+        teacher_probabilities(args.teacher, by_split['train'], device, pad_id, args.tokens_per_batch, autocast, args.teacher_temperature)
+        print('teacher probabilities for', len(by_split['train']), 'training messages,',
+              sum(len(m['positions']) for m in by_split['train']), 'sentences', flush=True)
+
     def epoch_messages():
         out = []
         for m in by_split['train']:
@@ -296,7 +319,7 @@ def train(args):
     scheduler = torch.optim.lr_scheduler.LambdaLR(
         optimizer, lambda s: (s + 1) / warmup if s < warmup else max(0.0, (total_steps - s) / max(1, total_steps - warmup)))
 
-    config = {'base': args.base, 'revision': args.revision if args.base == T.BASE else None, 'seed': args.seed,
+    config = {'teacher': args.teacher, 'teacher_weight': args.teacher_weight, 'base': args.base, 'revision': args.revision if args.base == T.BASE else None, 'seed': args.seed,
               'learning_rate': args.learning_rate, 'weight_decay': args.weight_decay, 'epochs': args.epochs,
               'max_tokens': args.max_tokens, 'tokens_per_batch': args.tokens_per_batch, 'batch_examples': args.batch_examples,
               'weights': weights, 'class_weights': class_weights, 'device': device, 'torch': torch.__version__, 'smoke': args.smoke,
@@ -318,7 +341,7 @@ def train(args):
         for micro in steps:
             if step >= total_steps:
                 break
-            n = sum(sum(t != IGNORE for t in m['targets']) for b in micro for m in b)
+            n = sum(len(m['positions']) if args.teacher else sum(t != IGNORE for t in m['targets']) for b in micro for m in b)
             optimizer.zero_grad(set_to_none=True)
             for batch in micro:
                 ids, mask, pos, targets = collate_messages(batch, pad_id, device)
@@ -326,6 +349,15 @@ def train(args):
                     logits = message_logits(model, ids, mask, pos)
                 loss = torch.nn.functional.cross_entropy(logits.float().reshape(-1, 3), targets.reshape(-1), weight=class_tensor,
                                                          ignore_index=IGNORE, reduction='sum')
+                if args.teacher:  # also match the teacher at every sentence, labeled or not
+                    k = logits.size(1)
+                    soft = torch.zeros((len(batch), k, 3))
+                    have = torch.zeros((len(batch), k), dtype=torch.bool)
+                    for i, m in enumerate(batch):
+                        soft[i, :len(m['soft'])] = m['soft']; have[i, :len(m['soft'])] = True
+                    log_p = torch.log_softmax(logits.float() / args.teacher_temperature, dim=-1)
+                    kl = torch.nn.functional.kl_div(log_p, soft.to(device), reduction='none').sum(-1)
+                    loss = loss + args.teacher_weight * (kl * have.to(device)).sum()
                 (loss / max(1, n)).backward()
                 loss_sum += loss.item(); seen += int((targets != IGNORE).sum())
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
@@ -461,6 +493,10 @@ def main():
     parser.add_argument('--smoke', action='store_true', help='tiny CPU run (a few messages, 256 tokens, one step) incl. export')
     parser.add_argument('--only-new-information', action='store_true',
                         help='unsupported means clearly new information only; borderline and told-wrong sentences carry no label')
+    parser.add_argument('--teacher', help='trained model directory (for example runs/x/epoch-3): the new model also learns '
+                        'to match its probabilities on every training sentence, including records marked "unlabeled"')
+    parser.add_argument('--teacher-weight', type=float, default=2.0)
+    parser.add_argument('--teacher-temperature', type=float, default=1.0)
     parser.add_argument('--stats', action='store_true', help='only count messages and sentences per message')
     train(parser.parse_args())
 
