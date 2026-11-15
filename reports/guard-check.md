@@ -60,5 +60,5 @@ The texts are in `data/local/guard/`, which Git ignores. They exist only on the 
 ## Files
 
 - Wheels: `released/python/decisiongator-0.4.3-py3-none-macosx_14_0_arm64.whl` and `decisiongator-0.4.3-py3-none-linux_x86_64.whl` (not in Git, not yet published to the download server). They hold the 0.4.1 native library and runtime unchanged, with the new model (`code/rebundle.py`).
-- Model: `models/guard-b/` (not in Git). The uncompressed checkpoint is only on the Colab machine that trained it (`runs/guard-b/best`, 1.7 GB) and is lost when that machine is released.
+- Model: `models/guard-b/` (not in Git). The uncompressed checkpoint (`best/model.safetensors`, 1.7 GB, sha256 `3a97a4f3e3df47bddfe5b5adbada6d16932ac89c5ed8b1b72878b74fb11af4bd`) was saved from the Colab machine that trained it on 2026-11-15, with its calibration and training history: on the Mac in `runs/guard-b-0.4.3/` (not in Git) and on Google Drive in `My Drive/DecisionGator/0.4.3/uncompressed-checkpoint/`. The two 0.4.3 wheels are in the same Drive folder. Further training starts from this checkpoint.
 - [guard-check/](guard-check/): training configuration and history, every probability behind the tables above (`scores-*.json`, no message text), and the general test results. [python-wheel-0.4.3-macos-arm64.json](python-wheel-0.4.3-macos-arm64.json) is the wheel check on the Mac.
