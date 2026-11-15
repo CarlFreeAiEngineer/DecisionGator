@@ -142,6 +142,8 @@ def build_model(args, tokenizer):
             options['attn_implementation'] = 'flash_attention_2'
         print('attention:', options.get('attn_implementation', 'default'), flush=True)
         model = AutoModelForSequenceClassification.from_pretrained(args.base, **options)
+        # ModernBERT compiles parts of itself; with a new sequence length in nearly every batch it keeps recompiling.
+        model.config.reference_compile = False
         names = {str(v).lower(): int(k) for k, v in model.config.id2label.items()}
         entail, not_entail = names.get('entailment', 0), names.get('not_entailment', 1)
     old = model.classifier
