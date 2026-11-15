@@ -25,7 +25,7 @@ REVISION = 'a51e07b524299e309dd2b88d48b0cfa2bd9ec598'
 LABELS = ['supported', 'unsupported', 'not_claim']
 SPLITS = ('train', 'validation', 'calibration', 'test', 'test_unseen')
 THRESHOLDS = (0.3, 0.4, 0.5, 0.6, 0.7)
-DEFAULT_DATA = [ROOT / 'data/evidence/invented.jsonl',
+DEFAULT_DATA = [ROOT / 'data/evidence/invented.jsonl.gz',
                 ROOT.parent / 'RealAiDating/evals/memory/evidence-labels/real-replies.jsonl.gz']
 
 

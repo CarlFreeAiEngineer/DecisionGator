@@ -43,3 +43,5 @@ __pycache__/
 
 # Sentences labeled from RealAiDating replies: private chat, never published here.
 /data/evidence/real-replies*.jsonl
+# Working file of training/evidence/make_invented.py; the published copy is invented.jsonl.gz (gzip -9 after a run).
+/data/evidence/invented.jsonl
