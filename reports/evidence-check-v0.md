@@ -10,9 +10,9 @@ First three-way model for the evidence check described in [specs/evidence-check.
 
 | Test | Sentences | Accuracy | Unsupported caught |
 | --- | ---: | ---: | ---: |
-| Invented, held out | 898 | 98.2% | 97.6% |
+| Invented, held out | 921 | 98.2% | 97.6% |
 | Invented, a subject never trained on | 1,237 | 97.7% | 96.6% |
-| Real, support removed (validation) | 113 | 100% | 100% |
+| Real, support removed (validation) | 71 | 100% | 100% |
 | Real Hy3 replies (test) | 277 | 85.2% | 55% |
 
 On the real Hy3 test, flagging a sentence when p(unsupported) is at least the threshold:
