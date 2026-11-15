@@ -281,6 +281,16 @@ def parse_weights(items):
     return weights
 
 
+def parse_class_weights(items):
+    weights = {}
+    for item in items or []:
+        name, _, w = item.partition('=')
+        if name not in LABELS:
+            raise ValueError(f'--class-weight: unknown label {name}')
+        weights[name] = float(w)
+    return weights
+
+
 def smoke_sample(rows, rng):
     picked = []
     for split, n in (('train', 20), ('validation', 8), ('calibration', 4), ('test', 4), ('test_unseen', 2)):
@@ -328,6 +338,8 @@ def train(args):
         model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={'use_reentrant': False})
     pad_id = tokenizer.pad_token_id
     weights = parse_weights(args.weight)
+    class_weights = parse_class_weights(args.class_weight)
+    class_tensor = torch.tensor([class_weights.get(l, 1.0) for l in LABELS], device=device) if class_weights else None
 
     def epoch_rows():
         rows_out = []
@@ -363,7 +375,7 @@ def train(args):
     config = {'base': args.base, 'revision': args.revision if args.base == BASE else None, 'seed': args.seed,
               'learning_rate': args.learning_rate, 'weight_decay': args.weight_decay, 'epochs': args.epochs,
               'max_tokens': args.max_tokens, 'tokens_per_batch': args.tokens_per_batch, 'batch_examples': args.batch_examples,
-              'weights': weights, 'device': device, 'torch': torch.__version__, 'smoke': args.smoke,
+              'weights': weights, 'class_weights': class_weights, 'device': device, 'torch': torch.__version__, 'smoke': args.smoke,
               'data': {p.name: digest(p) for p in paths}, 'train_script_sha256': digest(__file__),
               'records_per_split': {s: len(v) for s, v in by_split.items()}, 'truncation': stats}
     (output / 'config.json').write_text(json.dumps(config, indent=2) + '\n')
@@ -384,7 +396,7 @@ def train(args):
                 y = torch.tensor([LABELS.index(r['label']) for r in batch], device=device)
                 with torch.autocast('cuda', dtype=torch.bfloat16, enabled=autocast):
                     logits = model(input_ids=ids, attention_mask=mask).logits
-                loss = torch.nn.functional.cross_entropy(logits.float(), y, reduction='sum')
+                loss = torch.nn.functional.cross_entropy(logits.float(), y, weight=class_tensor, reduction='sum')
                 (loss / n).backward()
                 loss_sum += loss.item(); seen += len(batch)
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
@@ -482,6 +494,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--data', action='append', help='jsonl or jsonl.gz file; repeatable')
     parser.add_argument('--weight', action='append', metavar='FILE=W', help='upweight a source file (repeat W times per epoch)')
+    parser.add_argument('--class-weight', action='append', metavar='LABEL=W', help='loss weight for a class; repeatable')
     parser.add_argument('--output', help='run directory (must be new)')
     parser.add_argument('--base', help=f'foundation model (default {BASE}; "tiny" is a random toy model for tests)')
     parser.add_argument('--revision', default=REVISION)
