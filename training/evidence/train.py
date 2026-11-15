@@ -68,6 +68,26 @@ def load_data(paths):
     return rows
 
 
+def apply_relabels(rows, paths):
+    """Replace labels by id from reviewed files ({"id", "label", "confidence"}); a reviewer's "unsure" becomes borderline."""
+    import gzip
+    reviewed = {}
+    for path in paths:
+        opener = gzip.open if str(path).endswith('.gz') else open
+        with opener(path, 'rt', encoding='utf-8') as f:
+            for line in f:
+                if line.strip():
+                    item = json.loads(line)
+                    reviewed[item['id']] = item
+    changed = 0
+    for r in rows:
+        item = reviewed.get(r['id'])
+        if item:
+            changed += item['label'] != r['label']
+            r['label'], r['borderline'] = item['label'], item.get('confidence') == 'unsure'
+    print(f'relabels: {len(reviewed)} reviewed, {changed} labels changed', flush=True)
+
+
 def first_segment(row):
     return f'Sentence: {row["statement"]}\nIn the reply: {row["context"]}'
 
@@ -318,6 +338,8 @@ def train(args):
         args.export = True
     args.base = args.base or BASE
     rows = load_data(paths)
+    if args.relabel:
+        apply_relabels(rows, args.relabel)
     if args.smoke:
         rows = smoke_sample(rows, rng)
     tok_source, tok_options = (BASE, {'revision': REVISION}) if args.base == 'tiny' else (args.base, {'revision': args.revision} if args.base == BASE else {})
@@ -511,6 +533,7 @@ def main():
     parser.add_argument('--base', help=f'foundation model (default {BASE}; "tiny" is a random toy model for tests)')
     parser.add_argument('--revision', default=REVISION)
     parser.add_argument('--max-tokens', type=int, default=2560)
+    parser.add_argument('--relabel', action='append', default=[], help='reviewed labels by id (jsonl or jsonl.gz); repeatable')
     parser.add_argument('--tokens-per-batch', type=int, default=14000)
     parser.add_argument('--batch-examples', type=int, default=16, help='examples per optimizer step (gradient accumulation)')
     parser.add_argument('--epochs', type=int, default=3)
