@@ -1,0 +1,41 @@
+{
+  "format_version": 1,
+  "model_id": "evidence-check-0.2",
+  "labels": [
+    "supported",
+    "unsupported",
+    "not_claim"
+  ],
+  "max_tokens": 4096,
+  "temperature": 1.7352994680404663,
+  "base_model": "MoritzLaurer/ModernBERT-base-zeroshot-v2.0",
+  "base_revision": null,
+  "input_format": {
+    "first": "Reply: [1] sentence one [2] sentence two ... (one marker before each sentence, numbered from 1)",
+    "second": "Evidence:\n{evidence}",
+    "truncation": "evidence only, cut from the front; encode as [CLS] first [SEP] second [SEP]",
+    "marker_positions": "int64 [batch, n_markers]: index in input_ids of the first token of each \"[k]\" marker; pad with 0",
+    "inputs": [
+      "input_ids",
+      "attention_mask",
+      "marker_positions"
+    ],
+    "output": "logits [batch, n_markers, 3]",
+    "note": "one pass judges every sentence of the reply; rows for padded markers are meaningless"
+  },
+  "sha256": {
+    "model.onnx": "2c0ce6a9a625274c7ed8a8fdb643e9baf9d7d45511588586550f7a8836ab04cd",
+    "tokenizer.json": "6c8aaa9a542084f2457eab775d4eeb51f92a70c0fd9de28d5edb0ddec3c08d30"
+  },
+  "checkpoint_sha256": "194559cfc3a2a922fe77c76c1fe5d1d167b020122343bcb6b63deccd1405a5b5",
+  "train_script_sha256": "6f4a344763cfc392463b710751088cfdba90ccb46b61212da8d02667f08a51ea",
+  "data_sha256": {
+    "invented.jsonl.gz": "656e1f3a5326685b3b7eaa504813ee02e46f8c661b6a36cb689c524e23b91b9e",
+    "additions.jsonl.gz": "2157f31d1e7d55d900af1165520c0b194c527b82eddd577fd7db11cb2de01f84",
+    "real-replies.jsonl.gz": "ec957c540b5a3a70cb1de5c947206562fb68b8278c626bd3a0521372ddd93239",
+    "real-flips.jsonl.gz": "8fe4c4a0d3b715be48b6d74903ed39b04b72fdb7c7f8174a87e94757d3e47bce",
+    "real-additions.jsonl.gz": "3993b1906f0dddfa6499a7a7b531cd36c202aed475dc4e3e48f5e88ee3cf95d5",
+    "real-unlabeled.jsonl.gz": "731e9b753aa8769853e8d702634f0e1fcb82677feda54e096d5942140a012174"
+  },
+  "smoke": false
+}

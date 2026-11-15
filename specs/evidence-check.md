@@ -1,6 +1,6 @@
 # Evidence check: does a long text support a sentence?
 
-Status: 0.1 published as an experiment on 2026-11-15 ([release notes](../released/evidence-check-0.1/README.md), run with `uv run examples/evidence_check.py`); it catches about half of real inventions, well short of the goal. Results so far: [first round](../reports/evidence-check-v0.md), [second round](../reports/evidence-check-v1.md). Since the second round an alarm means clearly new information only: told-wrong and borderline sentences carry no label, 36 questions are test only, and a small model can learn from a large one. The request and its evidence are in [REDESIGN.md](../REDESIGN.md). This page holds the decisions made so far; change it as the work teaches better.
+Status: 0.2 published as an experiment on 2026-11-15 ([release notes](../released/evidence-check-0.2/README.md), run with `uv run examples/evidence_check.py`); it catches about 7 in 10 clear inventions at about 1 in 23 honest messages flagged, short of the goal. 0.1 (same day, about half caught) stays on the server. Results so far: [first round](../reports/evidence-check-v0.md), [second round](../reports/evidence-check-v1.md). Since the second round an alarm means clearly new information only: told-wrong and borderline sentences carry no label, 36 questions are test only, and a small model can learn from a large one. The request and its evidence are in [REDESIGN.md](../REDESIGN.md). This page holds the decisions made so far; change it as the work teaches better.
 
 ## Decisions
 

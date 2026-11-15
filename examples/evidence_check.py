@@ -3,18 +3,19 @@
 # requires-python = ">=3.11"
 # dependencies = ["onnxruntime>=1.22", "tokenizers>=0.20", "numpy"]
 # ///
-"""Evidence check 0.1 (experimental): which sentences of a reply does the evidence NOT support?
+"""Evidence check 0.2 (experimental): which sentences of a reply add information the evidence does not hold?
 
 Give it the text a reply was written from (the evidence: a chat history, notes, a source document)
 and the reply. It judges every sentence of the reply in one pass and prints, per sentence, the
-probability that it is supported, unsupported (possibly invented), or not a claim at all (a question,
-a feeling, a plan). Read specs/evidence-check.md before relying on it: it catches only about half
-of real inventions. See reports/evidence-check-v0.md.
+probability that it is supported, unsupported (clearly new information), or not a claim at all (a
+question, a feeling, a plan). Read released/evidence-check-0.2/README.md before relying on it: it
+catches about 7 in 10 clear inventions and flags about 1 in 23 honest messages. It does not look for
+known facts told wrongly. See reports/evidence-check-v1.md.
 
   uv run examples/evidence_check.py --evidence notes.txt --reply reply.txt
   uv run examples/evidence_check.py --demo
 
-The first run downloads the model (about 600 MB) into released/evidence-check-0.1/ and checks its hash.
+The first run downloads the model (about 600 MB) into released/evidence-check-0.2/ and checks its hash.
 """
 import argparse
 import hashlib
@@ -29,13 +30,19 @@ import onnxruntime as ort
 from tokenizers import Tokenizer
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = 'evidence-check-0.1'
+VERSION = 'evidence-check-0.2'
 MODEL_DIR = ROOT / 'released' / VERSION
 BASE_URL = f'https://62-84-178-253.sslip.io/DecisionGator/files/{VERSION}'
 LABELS = ['supported', 'unsupported', 'not_claim']
 
 DEMO_EVIDENCE = """Maya: I finally adopted a dog last weekend! She's a three-year-old beagle named Pepper.
+Sam: That's wonderful news. How is she settling in?
+Maya: Slowly. She hid under the kitchen table for the first two days, but last night she slept on the rug by my bed.
 Maya: The shelter said she was found near the train station in March.
+Sam: Poor thing. Does she eat well?
+Maya: Yes, she loves the chicken kibble, and my neighbor Rosa gave us a bag of treats.
+Maya: I took her to the vet on Thursday and she weighs eleven kilos, which the vet said is healthy.
+Sam: Any plans for the week?
 Maya: I'm nervous about leaving her alone when I go back to the office on Monday."""
 DEMO_REPLY = ("Congratulations on adopting Pepper! A three-year-old beagle is a great age. "
               "It's sweet that the shelter found her near the train station. "
@@ -86,15 +93,19 @@ class EvidenceCheck:
         self.cls = self.tokenizer.token_to_id('[CLS]')
         self.sep = self.tokenizer.token_to_id('[SEP]')
 
-    def check(self, evidence, sentences, max_tokens=2048):
+    def check(self, evidence, sentences, max_tokens=4096):
         """Per sentence, a dict of probabilities for supported / unsupported / not_claim.
         Only the evidence is cut to fit max_tokens, from the front (the newest part is kept).
-        The model was trained at 4,096 tokens; 2,048 keeps a CPU call to about 2.5 seconds."""
+        The model was trained at 4,096 tokens. 2,048 keeps a CPU call to about 2.5 seconds, but
+        cutting evidence the reply relied on more than doubles false alarms."""
         text, starts = 'Reply:', []
         for i, s in enumerate(sentences, 1):
             text += ' '
             starts.append(len(text))
             text += f'[{i}] {s}'
+        if len(evidence.split()) < 80:
+            print('warning: under about 100 tokens of evidence the model flags nearly everything; '
+                  'it was trained on evidence of 400 tokens and more', file=sys.stderr)
         reply = self.tokenizer.encode(text, add_special_tokens=False)
         a = reply.ids
         if len(a) > max_tokens // 2:
@@ -120,7 +131,7 @@ def main():
     parser.add_argument('--reply', type=Path, help='text file with the reply to check')
     parser.add_argument('--demo', action='store_true', help='run a built-in example')
     parser.add_argument('--threshold', type=float, default=0.5, help='flag a sentence when p(unsupported) is at least this')
-    parser.add_argument('--max-tokens', type=int, default=2048)
+    parser.add_argument('--max-tokens', type=int, default=4096, help='evidence beyond this is cut from the front')
     args = parser.parse_args()
     if args.demo:
         evidence, reply = DEMO_EVIDENCE, DEMO_REPLY

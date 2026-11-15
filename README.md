@@ -210,15 +210,15 @@ Building it? Start with the [developer specifications](specs/README.md).
 
 ## Experimental: is your chatbot making things up?
 
-A second, separate model checks a language model's reply against the text it was written from (a chat history, notes, a source document) and says, sentence by sentence, whether that text supports it. Run it before a reply reaches anyone, and rewrite or drop the sentences it flags. It reads up to about 2,000 tokens of evidence in about 2.5 seconds on a 6-core server processor, offline, like everything else here.
+A second, separate model checks a language model's reply against the text it was written from (a chat history, notes, a source document) and flags, sentence by sentence, clearly new information that the text does not hold. Run it before a reply reaches anyone, and rewrite or drop the sentences it flags. It reads up to 4,096 tokens in one pass, offline, like everything else here: about 2.5 seconds for 2,000 tokens and about 6 seconds for 3,500 on a 6-core server processor.
 
 ```text
 uv run examples/evidence_check.py --demo
-     unsupported 0.00  supported 0.05  not_claim 0.94  Congratulations on adopting Pepper!
-FLAG unsupported 0.98  supported 0.02  not_claim 0.01  I remember you said she loves swimming in the lake.
+     unsupported 0.06  supported 0.16  not_claim 0.78  It's sweet that the shelter found her near the train station.
+FLAG unsupported 0.84  supported 0.05  not_claim 0.11  I remember you said she loves swimming in the lake.
 ```
 
-**Honestly, it is barely useful yet.** On real replies from the model that invents most in our tests, it catches about half of the clear inventions while wrongly flagging about 1 in 25 honest messages. The goal is 9 in 10 caught. It scores 96 to 98% on made-up test material, so it has learned the task; what it lacks is enough real examples of language models inventing things. It is version 0.1, a Python script rather than a library function, and not yet in the language packages. Part of its training data is private, so retraining from this repository alone gives a different model. See [what it does and what it needs](released/evidence-check-0.1/README.md), [the measurements](reports/evidence-check-v0.md) and [the design](specs/evidence-check.md).
+**Honestly, it is useful but not yet dependable.** Version 0.2, on real replies to questions it never trained on, catches about 7 in 10 clear inventions (31 of 45) while wrongly flagging about 1 in 23 honest messages. The goal is 9 in 10 caught at 1 in 20 flagged. Version 0.1 caught about half. It only looks for new information: a known fact told wrongly (a changed name or number) is outside what it checks. Give it the whole text the reply was written from; cutting that text short more than doubles the false alarms, and with only a few lines of evidence (under about 100 tokens) it flags nearly everything. It is a Python script rather than a library function, and not yet in the language packages. Part of its training data is private, so retraining from this repository alone gives a different model. See [what it does and what it needs](released/evidence-check-0.2/README.md), [the measurements](reports/evidence-check-v1.md) and [the design](specs/evidence-check.md).
 
 ## Author
 
