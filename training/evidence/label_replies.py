@@ -192,7 +192,7 @@ def main():
     jobs = []
     for name in names:
         d = RUNS / name
-        m = re.fullmatch(r"app-([a-z0-9]+)-\d+", name)
+        m = re.fullmatch(r"app-([a-z0-9]+)-x?\d+", name)
         if not m or not (d / "replies.json").exists():
             print(f"skip {name}: not an app run with replies.json", file=sys.stderr)
             continue
