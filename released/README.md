@@ -31,4 +31,6 @@ The 0.4.1 browser bundle is approximately 580 MB and each 0.4.1 native bundle ap
 
 The binaries in this directory are not committed to Git; only the `.md` and `.json` records are. Published versions live at `https://62-84-178-253.sslip.io/DecisionGator/files/<version>/` with a `SHA256SUMS.txt`. `uv run code/fetch_released.py` downloads and verifies them into this directory (`--only macos-arm64` and similar select parts). Maintainers publish a new version with `uv run code/publish_released.py --version X.Y.Z`, which writes the checksum file and copies this directory to the server.
 
+The experimental evidence check, a separate model, is published as `evidence-check-0.1`; see [its notes](evidence-check-0.1/README.md). `examples/evidence_check.py` downloads it on first run.
+
 No artifacts have been published to PyPI, Maven Central, or npm. Local installation and packaging are implemented independently of that future publishing decision.

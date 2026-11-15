@@ -62,3 +62,7 @@ Speed on a Colab processor (Intel Xeon 2.2 GHz, 6 cores, ONNX Runtime 1.22.1, fl
 | 3,500 | 6.1 s | 13.5 s |
 
 So the base model with evidence trimmed to about 2,000 tokens fits the 1 to 3 second budget; nothing yet meets the accuracy goal on real replies.
+
+## Published as 0.1
+
+The base per-message model (`runs/evidence-message-base`, model sha256 `cd4e7179...`) was published on 2026-11-15 as `evidence-check-0.1`, marked experimental, with `examples/evidence_check.py` to run it.

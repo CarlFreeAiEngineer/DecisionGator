@@ -4,9 +4,9 @@
 
 Keep this section current: at the end of each work session, replace these three lines (don't append). If there is nothing left to do, say so and why, e.g. `none (finished)` or `none (parked: reason)`. `../LifeStaff/scripts/rundown.py` collects this section from every project.
 
-- Next step: work out how to make DecisionGator popular (who it is for, where to show it)
-- Waiting on: nothing
-- Last action: 2026-10-31, built Linux and Windows bundles on a Mac and checked them
+- Next step: more real training data for the evidence check (Hy3 and DeepSeek replies via OpenRouter, which costs money), then a larger reviewed test
+- Waiting on: a yes on OpenRouter spending
+- Last action: 2026-11-15, published evidence check 0.1 (experimental, catches about half of real inventions)
 
 ## Your software probably needs this.
 
@@ -215,6 +215,18 @@ The experimental Mac bundle is about **620 MB** and the browser bundle about **5
 The current version handles English text, yes/no questions, and multiple choice over caller-supplied options. Other decision types come later.
 
 Building it? Start with the [developer specifications](specs/README.md).
+
+## Experimental: is your chatbot making things up?
+
+A second, separate model checks a language model's reply against the text it was written from (a chat history, notes, a source document) and says, sentence by sentence, whether that text supports it. Run it before a reply reaches anyone, and rewrite or drop the sentences it flags. It reads up to about 2,000 tokens of evidence in about 2.5 seconds on a 6-core server processor, offline, like everything else here.
+
+```text
+uv run examples/evidence_check.py --demo
+     unsupported 0.00  supported 0.05  not_claim 0.94  Congratulations on adopting Pepper!
+FLAG unsupported 0.98  supported 0.02  not_claim 0.01  I remember you said she loves swimming in the lake.
+```
+
+**Honestly, it is barely useful yet.** On real replies from the model that invents most in our tests, it catches about half of the clear inventions while wrongly flagging about 1 in 25 honest messages. The goal is 9 in 10 caught. It scores 96 to 98% on made-up test material, so it has learned the task; what it lacks is enough real examples of language models inventing things. It is version 0.1, a Python script rather than a library function, and not yet in the language packages. Part of its training data is private, so retraining from this repository alone gives a different model. See [what it does and what it needs](released/evidence-check-0.1/README.md), [the measurements](reports/evidence-check-v0.md) and [the design](specs/evidence-check.md).
 
 ## Author
 

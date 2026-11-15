@@ -72,3 +72,7 @@ On Windows the Go and Rust examples also need `released\windows-x64` on `PATH` w
 ## Using it in your own project
 
 These examples point at this checkout's `released/` folder. In your own project, follow the guide for your language: [Python](../released/python/README.md), [Java](../java/README.md), [Node.js](../javascript/README.md), [browser](../web/README.md), [C#](../csharp/README.md), [C](../code/README.md). [EXAMPLE_USAGE.md](../EXAMPLE_USAGE.md) shows every call in every language.
+
+## Experimental: the evidence check
+
+`evidence_check.py` runs the separate evidence-check model: which sentences of a reply does the text it was written from not support? `uv run examples/evidence_check.py --demo` downloads the model (about 600 MB) on first run. It catches only about half of real inventions so far; see [its notes](../released/evidence-check-0.1/README.md).

@@ -1,6 +1,6 @@
 # Evidence check: does a long text support a sentence?
 
-Status: being built (started 2026-11-14). Results so far: [reports/evidence-check-v0.md](../reports/evidence-check-v0.md). The request and its evidence are in [REDESIGN.md](../REDESIGN.md). This page holds the decisions made so far; change it as the work teaches better.
+Status: 0.1 published as an experiment on 2026-11-15 ([release notes](../released/evidence-check-0.1/README.md), run with `uv run examples/evidence_check.py`); it catches about half of real inventions, well short of the goal. Results so far: [reports/evidence-check-v0.md](../reports/evidence-check-v0.md). The request and its evidence are in [REDESIGN.md](../REDESIGN.md). This page holds the decisions made so far; change it as the work teaches better.
 
 ## Decisions
 
