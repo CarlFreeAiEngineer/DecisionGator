@@ -37,3 +37,28 @@ ONNX Runtime 1.22.1 on the M1 Pro, 8 threads, one sentence per call:
 | 3,500 | 8.9 s | 7.5 s |
 
 Compressing the weights barely helps. Most of the time is the weight multiplications themselves: about 400 million parameters times 3,500 tokens is roughly 3 trillion operations, a few seconds on this CPU at best. Computing ModernBERT's local layers with their 128-token window (`training/evidence/export_fast.py`, same answers within 1.2e-4) saves only 15 to 35% at 1,000 to 3,500 tokens. A message of four sentences against a 3,500-token prompt takes about 35 seconds one sentence at a time, and about 9 seconds in one pass per message (`training/evidence/train_message.py`), against a budget of 1 to 3. The remaining levers are a smaller model (ModernBERT-base, about 150 million parameters) and shorter evidence.
+
+## Later the same night
+
+- **One pass per message** (`training/evidence/train_message.py`, a label at each sentence marker) scores about the same as one pass per sentence and costs one call per message.
+- **424 more real replies** from Claude Haiku and Sonnet to the same prompts (1,523 sentences, only 6% unsupported) did not improve the real test.
+- **ModernBERT-base** trained on everything is close to large on the clear real cases.
+
+Real Hy3 test, clear inventions only (13 sentences; one sentence moves the rate by 8 points), and messages with no invention (92):
+
+| Model | Threshold | Caught | Clean messages flagged |
+| --- | ---: | ---: | ---: |
+| Large, per message | 0.6 | 54% | 4% |
+| Large, per message, with the new replies | 0.5 | 46% | 5% |
+| Base, per message, with the new replies | 0.5 | 46% | 4% |
+| Base, per message, with the new replies | 0.7 | 31% | 2% |
+
+Speed on a Colab processor (Intel Xeon 2.2 GHz, 6 cores, ONNX Runtime 1.22.1, float32), one pass per message:
+
+| Tokens | Base | Large |
+| ---: | ---: | ---: |
+| 1,000 | 0.75 s | 2.3 s |
+| 2,000 | 2.5 s | 5.7 s |
+| 3,500 | 6.1 s | 13.5 s |
+
+So the base model with evidence trimmed to about 2,000 tokens fits the 1 to 3 second budget; nothing yet meets the accuracy goal on real replies.

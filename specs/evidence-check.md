@@ -1,6 +1,6 @@
 # Evidence check: does a long text support a sentence?
 
-Status: being built (started 2026-11-14). The request and its evidence are in [REDESIGN.md](../REDESIGN.md). This page holds the decisions made so far; change it as the work teaches better.
+Status: being built (started 2026-11-14). Results so far: [reports/evidence-check-v0.md](../reports/evidence-check-v0.md). The request and its evidence are in [REDESIGN.md](../REDESIGN.md). This page holds the decisions made so far; change it as the work teaches better.
 
 ## Decisions
 
