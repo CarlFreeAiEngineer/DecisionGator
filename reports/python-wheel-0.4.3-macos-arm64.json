@@ -1,0 +1,15 @@
+{
+  "status": "passed",
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "wheel": "decisiongator-0.4.3-py3-none-macosx_14_0_arm64.whl",
+  "network_denied": true,
+  "checkout_read_denied": true,
+  "network_isolation": "macOS sandbox",
+  "consumer": {
+    "probability": 0.9873730134041312,
+    "custom_probability": 0.9881084104236909,
+    "module": "/Users/ace/.cache/uv/archive-v0/MWzCe66ajULppVAE/lib/python3.12/site-packages/decisiongator/__init__.py",
+    "concurrent_calls": 8
+  },
+  "stderr": "Installed 1 package in 3ms\n"
+}

@@ -27,8 +27,8 @@ CHILD_CRITERIA = {
     'no': 'Everyone it mentions is an adult. Pet names for an adult (baby, girl, boy, little man, daddy) do not count, '
           'nor does a child who is only in Known or Before.',
 }
-SEXUAL_THRESHOLD = 0.10  # at or above: the message has sexual content. Low on purpose: every doubt blocks.
-CHILD_THRESHOLD = 0.10   # at or above: a child is mentioned.
+SEXUAL_THRESHOLD = 0.03  # at or above: the message has sexual content. Low on purpose: every doubt blocks.
+CHILD_THRESHOLD = 0.20   # at or above: a child is mentioned.
 PIECE_CHARS = 320        # a long message is read in overlapping pieces of about this many characters
 KNOWN_CHARS = 160        # background is cut to this much, to stay inside the model's 256-token input
 BEFORE_CHARS = 160

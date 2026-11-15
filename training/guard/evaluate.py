@@ -36,7 +36,7 @@ def scorer(bundle):
     manifest = json.loads((bundle / 'manifest.json').read_text())
     tokenizer = Tokenizer.from_file(str(bundle / 'tokenizer.json'))
     options = ort.SessionOptions()
-    options.intra_op_num_threads = 8
+    options.intra_op_num_threads = 4  # leave the machine usable while scoring
     session = ort.InferenceSession(str(bundle / 'model.onnx'), options, providers=['CPUExecutionProvider'])
     temperature = manifest.get('temperature', 1.0)
     state = {'calls': 0, 'seconds': 0.0, 'longest': 0}

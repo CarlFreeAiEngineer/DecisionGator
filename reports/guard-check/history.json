@@ -1,0 +1,1181 @@
+[
+  {
+    "epoch": 1,
+    "train_loss": 0.10391308845034569,
+    "training": {
+      "count": 11219,
+      "accuracy": 0.9918887601390498,
+      "balanced_accuracy": 0.9922366360926869,
+      "brier": 0.006943736722511605,
+      "log_loss": 0.03132803282927179,
+      "by_family": {
+        "appointment": {
+          "count": 42,
+          "accuracy": 1.0
+        },
+        "appointment_boundary": {
+          "count": 6,
+          "accuracy": 0.6666666666666666
+        },
+        "appointment_intent": {
+          "count": 202,
+          "accuracy": 0.995049504950495
+        },
+        "billing_boundary": {
+          "count": 8,
+          "accuracy": 0.75
+        },
+        "cancellation": {
+          "count": 10,
+          "accuracy": 1.0
+        },
+        "cancellation_intent": {
+          "count": 186,
+          "accuracy": 1.0
+        },
+        "capacity_boundary": {
+          "count": 8,
+          "accuracy": 1.0
+        },
+        "coding_billing": {
+          "count": 10,
+          "accuracy": 1.0
+        },
+        "coding_routing": {
+          "count": 32,
+          "accuracy": 1.0
+        },
+        "conditions": {
+          "count": 10,
+          "accuracy": 0.9
+        },
+        "day_or_time_lookup": {
+          "count": 40,
+          "accuracy": 1.0
+        },
+        "department_routing": {
+          "count": 110,
+          "accuracy": 0.990909090909091
+        },
+        "duplicate": {
+          "count": 32,
+          "accuracy": 1.0
+        },
+        "duplicate_issue": {
+          "count": 10,
+          "accuracy": 1.0
+        },
+        "duplicate_reports": {
+          "count": 202,
+          "accuracy": 1.0
+        },
+        "eligibility": {
+          "count": 186,
+          "accuracy": 0.978494623655914
+        },
+        "email_screening": {
+          "count": 188,
+          "accuracy": 1.0
+        },
+        "events_timeline": {
+          "count": 186,
+          "accuracy": 0.989247311827957
+        },
+        "everyday": {
+          "count": 196,
+          "accuracy": 1.0
+        },
+        "evidence_presence": {
+          "count": 186,
+          "accuracy": 1.0
+        },
+        "guard_child": {
+          "count": 4553,
+          "accuracy": 0.9956072918954535
+        },
+        "guard_sexual": {
+          "count": 2564,
+          "accuracy": 0.999609984399376
+        },
+        "language_of_text": {
+          "count": 40,
+          "accuracy": 0.8
+        },
+        "mixed_intent": {
+          "count": 10,
+          "accuracy": 1.0
+        },
+        "negation": {
+          "count": 196,
+          "accuracy": 1.0
+        },
+        "numeric_criteria": {
+          "count": 186,
+          "accuracy": 0.8655913978494624
+        },
+        "permission": {
+          "count": 10,
+          "accuracy": 1.0
+        },
+        "permissions": {
+          "count": 186,
+          "accuracy": 0.978494623655914
+        },
+        "quantity_boundary": {
+          "count": 8,
+          "accuracy": 1.0
+        },
+        "quoted_instructions": {
+          "count": 186,
+          "accuracy": 1.0
+        },
+        "reference": {
+          "count": 10,
+          "accuracy": 1.0
+        },
+        "refund": {
+          "count": 42,
+          "accuracy": 0.9761904761904762
+        },
+        "refund_boundary": {
+          "count": 6,
+          "accuracy": 1.0
+        },
+        "refund_intent": {
+          "count": 202,
+          "accuracy": 1.0
+        },
+        "reported_speech": {
+          "count": 10,
+          "accuracy": 1.0
+        },
+        "request_routing": {
+          "count": 16,
+          "accuracy": 1.0
+        },
+        "request_type": {
+          "count": 99,
+          "accuracy": 0.9696969696969697
+        },
+        "routing": {
+          "count": 186,
+          "accuracy": 0.9946236559139785
+        },
+        "sentiment": {
+          "count": 40,
+          "accuracy": 0.95
+        },
+        "spam_promotion": {
+          "count": 190,
+          "accuracy": 1.0
+        },
+        "support_routing": {
+          "count": 307,
+          "accuracy": 0.9739413680781759
+        },
+        "temporal": {
+          "count": 10,
+          "accuracy": 1.0
+        },
+        "time_boundary": {
+          "count": 6,
+          "accuracy": 1.0
+        },
+        "unit_or_quantity": {
+          "count": 40,
+          "accuracy": 1.0
+        },
+        "urgency": {
+          "count": 218,
+          "accuracy": 0.9908256880733946
+        },
+        "urgency_boundary": {
+          "count": 8,
+          "accuracy": 0.75
+        },
+        "urgency_level": {
+          "count": 40,
+          "accuracy": 0.975
+        }
+      }
+    },
+    "validation": {
+      "count": 1630,
+      "accuracy": 0.9748466257668712,
+      "balanced_accuracy": 0.9751506668459592,
+      "brier": 0.02271872777647374,
+      "log_loss": 0.10562199579837526,
+      "by_family": {
+        "appointment": {
+          "count": 10,
+          "accuracy": 1.0
+        },
+        "appointment_intent": {
+          "count": 26,
+          "accuracy": 1.0
+        },
+        "boundary_budget": {
+          "count": 2,
+          "accuracy": 1.0
+        },
+        "boundary_distance": {
+          "count": 2,
+          "accuracy": 0.5
+        },
+        "boundary_duration": {
+          "count": 2,
+          "accuracy": 0.5
+        },
+        "boundary_ratio": {
+          "count": 2,
+          "accuracy": 0.5
+        },
+        "boundary_stock": {
+          "count": 2,
+          "accuracy": 0.5
+        },
+        "cancellation": {
+          "count": 2,
+          "accuracy": 1.0
+        },
+        "cancellation_intent": {
+          "count": 22,
+          "accuracy": 0.9545454545454546
+        },
+        "coding_billing": {
+          "count": 2,
+          "accuracy": 1.0
+        },
+        "coding_routing": {
+          "count": 8,
+          "accuracy": 1.0
+        },
+        "conditions": {
+          "count": 2,
+          "accuracy": 0.5
+        },
+        "day_or_time_lookup": {
+          "count": 12,
+          "accuracy": 1.0
+        },
+        "department_routing": {
+          "count": 19,
+          "accuracy": 0.8421052631578947
+        },
+        "duplicate": {
+          "count": 8,
+          "accuracy": 1.0
+        },
+        "duplicate_issue": {
+          "count": 2,
+          "accuracy": 1.0
+        },
+        "duplicate_reports": {
+          "count": 26,
+          "accuracy": 0.9615384615384616
+        },
+        "eligibility": {
+          "count": 22,
+          "accuracy": 0.8181818181818182
+        },
+        "email_screening": {
+          "count": 22,
+          "accuracy": 0.9545454545454546
+        },
+        "events_timeline": {
+          "count": 22,
+          "accuracy": 0.9090909090909091
+        },
+        "everyday": {
+          "count": 24,
+          "accuracy": 1.0
+        },
+        "evidence_presence": {
+          "count": 22,
+          "accuracy": 1.0
+        },
+        "guard_child": {
+          "count": 721,
+          "accuracy": 0.9958391123439667
+        },
+        "guard_sexual": {
+          "count": 338,
+          "accuracy": 0.9911242603550295
+        },
+        "language_of_text": {
+          "count": 8,
+          "accuracy": 0.75
+        },
+        "mixed_intent": {
+          "count": 4,
+          "accuracy": 1.0
+        },
+        "negation": {
+          "count": 26,
+          "accuracy": 1.0
+        },
+        "numeric_criteria": {
+          "count": 22,
+          "accuracy": 0.7727272727272727
+        },
+        "permission": {
+          "count": 2,
+          "accuracy": 1.0
+        },
+        "permissions": {
+          "count": 22,
+          "accuracy": 0.9545454545454546
+        },
+        "quoted_instructions": {
+          "count": 22,
+          "accuracy": 0.9090909090909091
+        },
+        "reference": {
+          "count": 2,
+          "accuracy": 1.0
+        },
+        "refund": {
+          "count": 10,
+          "accuracy": 0.8
+        },
+        "refund_intent": {
+          "count": 26,
+          "accuracy": 1.0
+        },
+        "reported_speech": {
+          "count": 2,
+          "accuracy": 1.0
+        },
+        "request_routing": {
+          "count": 4,
+          "accuracy": 1.0
+        },
+        "request_type": {
+          "count": 19,
+          "accuracy": 0.9473684210526315
+        },
+        "routing": {
+          "count": 22,
+          "accuracy": 1.0
+        },
+        "sentiment": {
+          "count": 8,
+          "accuracy": 0.875
+        },
+        "spam_promotion": {
+          "count": 22,
+          "accuracy": 0.9545454545454546
+        },
+        "support_routing": {
+          "count": 37,
+          "accuracy": 0.972972972972973
+        },
+        "temporal": {
+          "count": 2,
+          "accuracy": 1.0
+        },
+        "unit_or_quantity": {
+          "count": 8,
+          "accuracy": 1.0
+        },
+        "urgency": {
+          "count": 30,
+          "accuracy": 0.9333333333333333
+        },
+        "urgency_level": {
+          "count": 12,
+          "accuracy": 1.0
+        }
+      },
+      "choice_accuracy": 0.8823529411764706,
+      "choice_count": 34
+    },
+    "elapsed_seconds": 449.47120193199953
+  },
+  {
+    "epoch": 2,
+    "train_loss": 0.0460682017221062,
+    "training": {
+      "count": 11219,
+      "accuracy": 0.997415099384972,
+      "balanced_accuracy": 0.9974330319945202,
+      "brier": 0.0021513268442401503,
+      "log_loss": 0.009487080463028364,
+      "by_family": {
+        "appointment": {
+          "count": 42,
+          "accuracy": 1.0
+        },
+        "appointment_boundary": {
+          "count": 6,
+          "accuracy": 1.0
+        },
+        "appointment_intent": {
+          "count": 202,
+          "accuracy": 1.0
+        },
+        "billing_boundary": {
+          "count": 8,
+          "accuracy": 0.75
+        },
+        "cancellation": {
+          "count": 10,
+          "accuracy": 1.0
+        },
+        "cancellation_intent": {
+          "count": 186,
+          "accuracy": 1.0
+        },
+        "capacity_boundary": {
+          "count": 8,
+          "accuracy": 1.0
+        },
+        "coding_billing": {
+          "count": 10,
+          "accuracy": 1.0
+        },
+        "coding_routing": {
+          "count": 32,
+          "accuracy": 1.0
+        },
+        "conditions": {
+          "count": 10,
+          "accuracy": 1.0
+        },
+        "day_or_time_lookup": {
+          "count": 40,
+          "accuracy": 1.0
+        },
+        "department_routing": {
+          "count": 110,
+          "accuracy": 1.0
+        },
+        "duplicate": {
+          "count": 32,
+          "accuracy": 1.0
+        },
+        "duplicate_issue": {
+          "count": 10,
+          "accuracy": 1.0
+        },
+        "duplicate_reports": {
+          "count": 202,
+          "accuracy": 0.995049504950495
+        },
+        "eligibility": {
+          "count": 186,
+          "accuracy": 0.989247311827957
+        },
+        "email_screening": {
+          "count": 188,
+          "accuracy": 0.9946808510638298
+        },
+        "events_timeline": {
+          "count": 186,
+          "accuracy": 1.0
+        },
+        "everyday": {
+          "count": 196,
+          "accuracy": 1.0
+        },
+        "evidence_presence": {
+          "count": 186,
+          "accuracy": 1.0
+        },
+        "guard_child": {
+          "count": 4553,
+          "accuracy": 0.9997803645947727
+        },
+        "guard_sexual": {
+          "count": 2564,
+          "accuracy": 0.999609984399376
+        },
+        "language_of_text": {
+          "count": 40,
+          "accuracy": 0.925
+        },
+        "mixed_intent": {
+          "count": 10,
+          "accuracy": 1.0
+        },
+        "negation": {
+          "count": 196,
+          "accuracy": 1.0
+        },
+        "numeric_criteria": {
+          "count": 186,
+          "accuracy": 0.9354838709677419
+        },
+        "permission": {
+          "count": 10,
+          "accuracy": 1.0
+        },
+        "permissions": {
+          "count": 186,
+          "accuracy": 1.0
+        },
+        "quantity_boundary": {
+          "count": 8,
+          "accuracy": 1.0
+        },
+        "quoted_instructions": {
+          "count": 186,
+          "accuracy": 1.0
+        },
+        "reference": {
+          "count": 10,
+          "accuracy": 1.0
+        },
+        "refund": {
+          "count": 42,
+          "accuracy": 1.0
+        },
+        "refund_boundary": {
+          "count": 6,
+          "accuracy": 1.0
+        },
+        "refund_intent": {
+          "count": 202,
+          "accuracy": 1.0
+        },
+        "reported_speech": {
+          "count": 10,
+          "accuracy": 1.0
+        },
+        "request_routing": {
+          "count": 16,
+          "accuracy": 1.0
+        },
+        "request_type": {
+          "count": 99,
+          "accuracy": 0.9797979797979798
+        },
+        "routing": {
+          "count": 186,
+          "accuracy": 1.0
+        },
+        "sentiment": {
+          "count": 40,
+          "accuracy": 1.0
+        },
+        "spam_promotion": {
+          "count": 190,
+          "accuracy": 1.0
+        },
+        "support_routing": {
+          "count": 307,
+          "accuracy": 0.996742671009772
+        },
+        "temporal": {
+          "count": 10,
+          "accuracy": 1.0
+        },
+        "time_boundary": {
+          "count": 6,
+          "accuracy": 1.0
+        },
+        "unit_or_quantity": {
+          "count": 40,
+          "accuracy": 1.0
+        },
+        "urgency": {
+          "count": 218,
+          "accuracy": 0.9954128440366973
+        },
+        "urgency_boundary": {
+          "count": 8,
+          "accuracy": 1.0
+        },
+        "urgency_level": {
+          "count": 40,
+          "accuracy": 0.95
+        }
+      }
+    },
+    "validation": {
+      "count": 1630,
+      "accuracy": 0.9797546012269939,
+      "balanced_accuracy": 0.9798295906018117,
+      "brier": 0.016737230395731002,
+      "log_loss": 0.07911810646430519,
+      "by_family": {
+        "appointment": {
+          "count": 10,
+          "accuracy": 1.0
+        },
+        "appointment_intent": {
+          "count": 26,
+          "accuracy": 1.0
+        },
+        "boundary_budget": {
+          "count": 2,
+          "accuracy": 1.0
+        },
+        "boundary_distance": {
+          "count": 2,
+          "accuracy": 0.5
+        },
+        "boundary_duration": {
+          "count": 2,
+          "accuracy": 0.5
+        },
+        "boundary_ratio": {
+          "count": 2,
+          "accuracy": 1.0
+        },
+        "boundary_stock": {
+          "count": 2,
+          "accuracy": 0.5
+        },
+        "cancellation": {
+          "count": 2,
+          "accuracy": 1.0
+        },
+        "cancellation_intent": {
+          "count": 22,
+          "accuracy": 0.9545454545454546
+        },
+        "coding_billing": {
+          "count": 2,
+          "accuracy": 1.0
+        },
+        "coding_routing": {
+          "count": 8,
+          "accuracy": 1.0
+        },
+        "conditions": {
+          "count": 2,
+          "accuracy": 0.5
+        },
+        "day_or_time_lookup": {
+          "count": 12,
+          "accuracy": 1.0
+        },
+        "department_routing": {
+          "count": 19,
+          "accuracy": 0.7894736842105263
+        },
+        "duplicate": {
+          "count": 8,
+          "accuracy": 1.0
+        },
+        "duplicate_issue": {
+          "count": 2,
+          "accuracy": 1.0
+        },
+        "duplicate_reports": {
+          "count": 26,
+          "accuracy": 0.9615384615384616
+        },
+        "eligibility": {
+          "count": 22,
+          "accuracy": 0.9090909090909091
+        },
+        "email_screening": {
+          "count": 22,
+          "accuracy": 0.9545454545454546
+        },
+        "events_timeline": {
+          "count": 22,
+          "accuracy": 1.0
+        },
+        "everyday": {
+          "count": 24,
+          "accuracy": 0.9583333333333334
+        },
+        "evidence_presence": {
+          "count": 22,
+          "accuracy": 0.9545454545454546
+        },
+        "guard_child": {
+          "count": 721,
+          "accuracy": 0.9986130374479889
+        },
+        "guard_sexual": {
+          "count": 338,
+          "accuracy": 0.9970414201183432
+        },
+        "language_of_text": {
+          "count": 8,
+          "accuracy": 0.875
+        },
+        "mixed_intent": {
+          "count": 4,
+          "accuracy": 1.0
+        },
+        "negation": {
+          "count": 26,
+          "accuracy": 1.0
+        },
+        "numeric_criteria": {
+          "count": 22,
+          "accuracy": 0.7727272727272727
+        },
+        "permission": {
+          "count": 2,
+          "accuracy": 1.0
+        },
+        "permissions": {
+          "count": 22,
+          "accuracy": 0.9090909090909091
+        },
+        "quoted_instructions": {
+          "count": 22,
+          "accuracy": 0.8636363636363636
+        },
+        "reference": {
+          "count": 2,
+          "accuracy": 1.0
+        },
+        "refund": {
+          "count": 10,
+          "accuracy": 1.0
+        },
+        "refund_intent": {
+          "count": 26,
+          "accuracy": 1.0
+        },
+        "reported_speech": {
+          "count": 2,
+          "accuracy": 1.0
+        },
+        "request_routing": {
+          "count": 4,
+          "accuracy": 1.0
+        },
+        "request_type": {
+          "count": 19,
+          "accuracy": 1.0
+        },
+        "routing": {
+          "count": 22,
+          "accuracy": 1.0
+        },
+        "sentiment": {
+          "count": 8,
+          "accuracy": 0.875
+        },
+        "spam_promotion": {
+          "count": 22,
+          "accuracy": 0.9545454545454546
+        },
+        "support_routing": {
+          "count": 37,
+          "accuracy": 1.0
+        },
+        "temporal": {
+          "count": 2,
+          "accuracy": 1.0
+        },
+        "unit_or_quantity": {
+          "count": 8,
+          "accuracy": 1.0
+        },
+        "urgency": {
+          "count": 30,
+          "accuracy": 0.9333333333333333
+        },
+        "urgency_level": {
+          "count": 12,
+          "accuracy": 0.9166666666666666
+        }
+      },
+      "choice_accuracy": 0.8823529411764706,
+      "choice_count": 34
+    },
+    "elapsed_seconds": 916.9338945299969
+  },
+  {
+    "epoch": 3,
+    "train_loss": 0.02759447807349163,
+    "training": {
+      "count": 11219,
+      "accuracy": 0.9975042338889384,
+      "balanced_accuracy": 0.9974337236698505,
+      "brier": 0.0022284849332423542,
+      "log_loss": 0.010011444146688324,
+      "by_family": {
+        "appointment": {
+          "count": 42,
+          "accuracy": 1.0
+        },
+        "appointment_boundary": {
+          "count": 6,
+          "accuracy": 1.0
+        },
+        "appointment_intent": {
+          "count": 202,
+          "accuracy": 1.0
+        },
+        "billing_boundary": {
+          "count": 8,
+          "accuracy": 0.875
+        },
+        "cancellation": {
+          "count": 10,
+          "accuracy": 1.0
+        },
+        "cancellation_intent": {
+          "count": 186,
+          "accuracy": 1.0
+        },
+        "capacity_boundary": {
+          "count": 8,
+          "accuracy": 1.0
+        },
+        "coding_billing": {
+          "count": 10,
+          "accuracy": 1.0
+        },
+        "coding_routing": {
+          "count": 32,
+          "accuracy": 1.0
+        },
+        "conditions": {
+          "count": 10,
+          "accuracy": 1.0
+        },
+        "day_or_time_lookup": {
+          "count": 40,
+          "accuracy": 1.0
+        },
+        "department_routing": {
+          "count": 110,
+          "accuracy": 1.0
+        },
+        "duplicate": {
+          "count": 32,
+          "accuracy": 1.0
+        },
+        "duplicate_issue": {
+          "count": 10,
+          "accuracy": 1.0
+        },
+        "duplicate_reports": {
+          "count": 202,
+          "accuracy": 1.0
+        },
+        "eligibility": {
+          "count": 186,
+          "accuracy": 0.978494623655914
+        },
+        "email_screening": {
+          "count": 188,
+          "accuracy": 1.0
+        },
+        "events_timeline": {
+          "count": 186,
+          "accuracy": 0.9946236559139785
+        },
+        "everyday": {
+          "count": 196,
+          "accuracy": 1.0
+        },
+        "evidence_presence": {
+          "count": 186,
+          "accuracy": 1.0
+        },
+        "guard_child": {
+          "count": 4553,
+          "accuracy": 0.9997803645947727
+        },
+        "guard_sexual": {
+          "count": 2564,
+          "accuracy": 0.999609984399376
+        },
+        "language_of_text": {
+          "count": 40,
+          "accuracy": 0.925
+        },
+        "mixed_intent": {
+          "count": 10,
+          "accuracy": 1.0
+        },
+        "negation": {
+          "count": 196,
+          "accuracy": 1.0
+        },
+        "numeric_criteria": {
+          "count": 186,
+          "accuracy": 0.9247311827956989
+        },
+        "permission": {
+          "count": 10,
+          "accuracy": 1.0
+        },
+        "permissions": {
+          "count": 186,
+          "accuracy": 1.0
+        },
+        "quantity_boundary": {
+          "count": 8,
+          "accuracy": 1.0
+        },
+        "quoted_instructions": {
+          "count": 186,
+          "accuracy": 1.0
+        },
+        "reference": {
+          "count": 10,
+          "accuracy": 1.0
+        },
+        "refund": {
+          "count": 42,
+          "accuracy": 1.0
+        },
+        "refund_boundary": {
+          "count": 6,
+          "accuracy": 0.8333333333333334
+        },
+        "refund_intent": {
+          "count": 202,
+          "accuracy": 1.0
+        },
+        "reported_speech": {
+          "count": 10,
+          "accuracy": 1.0
+        },
+        "request_routing": {
+          "count": 16,
+          "accuracy": 1.0
+        },
+        "request_type": {
+          "count": 99,
+          "accuracy": 1.0
+        },
+        "routing": {
+          "count": 186,
+          "accuracy": 1.0
+        },
+        "sentiment": {
+          "count": 40,
+          "accuracy": 1.0
+        },
+        "spam_promotion": {
+          "count": 190,
+          "accuracy": 0.9947368421052631
+        },
+        "support_routing": {
+          "count": 307,
+          "accuracy": 0.996742671009772
+        },
+        "temporal": {
+          "count": 10,
+          "accuracy": 1.0
+        },
+        "time_boundary": {
+          "count": 6,
+          "accuracy": 1.0
+        },
+        "unit_or_quantity": {
+          "count": 40,
+          "accuracy": 1.0
+        },
+        "urgency": {
+          "count": 218,
+          "accuracy": 1.0
+        },
+        "urgency_boundary": {
+          "count": 8,
+          "accuracy": 1.0
+        },
+        "urgency_level": {
+          "count": 40,
+          "accuracy": 1.0
+        }
+      }
+    },
+    "validation": {
+      "count": 1630,
+      "accuracy": 0.9748466257668712,
+      "balanced_accuracy": 0.9742429984230407,
+      "brier": 0.023359220166484587,
+      "log_loss": 0.13732850793429663,
+      "by_family": {
+        "appointment": {
+          "count": 10,
+          "accuracy": 1.0
+        },
+        "appointment_intent": {
+          "count": 26,
+          "accuracy": 1.0
+        },
+        "boundary_budget": {
+          "count": 2,
+          "accuracy": 1.0
+        },
+        "boundary_distance": {
+          "count": 2,
+          "accuracy": 0.5
+        },
+        "boundary_duration": {
+          "count": 2,
+          "accuracy": 0.5
+        },
+        "boundary_ratio": {
+          "count": 2,
+          "accuracy": 0.5
+        },
+        "boundary_stock": {
+          "count": 2,
+          "accuracy": 0.5
+        },
+        "cancellation": {
+          "count": 2,
+          "accuracy": 1.0
+        },
+        "cancellation_intent": {
+          "count": 22,
+          "accuracy": 1.0
+        },
+        "coding_billing": {
+          "count": 2,
+          "accuracy": 1.0
+        },
+        "coding_routing": {
+          "count": 8,
+          "accuracy": 1.0
+        },
+        "conditions": {
+          "count": 2,
+          "accuracy": 0.5
+        },
+        "day_or_time_lookup": {
+          "count": 12,
+          "accuracy": 1.0
+        },
+        "department_routing": {
+          "count": 19,
+          "accuracy": 0.8421052631578947
+        },
+        "duplicate": {
+          "count": 8,
+          "accuracy": 1.0
+        },
+        "duplicate_issue": {
+          "count": 2,
+          "accuracy": 1.0
+        },
+        "duplicate_reports": {
+          "count": 26,
+          "accuracy": 0.8846153846153846
+        },
+        "eligibility": {
+          "count": 22,
+          "accuracy": 0.8636363636363636
+        },
+        "email_screening": {
+          "count": 22,
+          "accuracy": 0.9090909090909091
+        },
+        "events_timeline": {
+          "count": 22,
+          "accuracy": 1.0
+        },
+        "everyday": {
+          "count": 24,
+          "accuracy": 0.9583333333333334
+        },
+        "evidence_presence": {
+          "count": 22,
+          "accuracy": 1.0
+        },
+        "guard_child": {
+          "count": 721,
+          "accuracy": 0.9972260748959778
+        },
+        "guard_sexual": {
+          "count": 338,
+          "accuracy": 0.9911242603550295
+        },
+        "language_of_text": {
+          "count": 8,
+          "accuracy": 1.0
+        },
+        "mixed_intent": {
+          "count": 4,
+          "accuracy": 1.0
+        },
+        "negation": {
+          "count": 26,
+          "accuracy": 1.0
+        },
+        "numeric_criteria": {
+          "count": 22,
+          "accuracy": 0.6818181818181818
+        },
+        "permission": {
+          "count": 2,
+          "accuracy": 1.0
+        },
+        "permissions": {
+          "count": 22,
+          "accuracy": 0.9545454545454546
+        },
+        "quoted_instructions": {
+          "count": 22,
+          "accuracy": 0.9090909090909091
+        },
+        "reference": {
+          "count": 2,
+          "accuracy": 1.0
+        },
+        "refund": {
+          "count": 10,
+          "accuracy": 0.9
+        },
+        "refund_intent": {
+          "count": 26,
+          "accuracy": 0.9615384615384616
+        },
+        "reported_speech": {
+          "count": 2,
+          "accuracy": 1.0
+        },
+        "request_routing": {
+          "count": 4,
+          "accuracy": 1.0
+        },
+        "request_type": {
+          "count": 19,
+          "accuracy": 1.0
+        },
+        "routing": {
+          "count": 22,
+          "accuracy": 0.9545454545454546
+        },
+        "sentiment": {
+          "count": 8,
+          "accuracy": 1.0
+        },
+        "spam_promotion": {
+          "count": 22,
+          "accuracy": 0.9545454545454546
+        },
+        "support_routing": {
+          "count": 37,
+          "accuracy": 0.972972972972973
+        },
+        "temporal": {
+          "count": 2,
+          "accuracy": 1.0
+        },
+        "unit_or_quantity": {
+          "count": 8,
+          "accuracy": 1.0
+        },
+        "urgency": {
+          "count": 30,
+          "accuracy": 0.8666666666666667
+        },
+        "urgency_level": {
+          "count": 12,
+          "accuracy": 1.0
+        }
+      },
+      "choice_accuracy": 0.9117647058823529,
+      "choice_count": 34
+    },
+    "elapsed_seconds": 1406.7127713060036
+  }
+]

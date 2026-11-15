@@ -15,7 +15,7 @@ Two questions, combined in code. Do not ask one joined question ("a child and al
 1. **Sexual content.** `is_yes_p(piece, "Does this message contain sexual content?")`, on the bare message, no criteria.
 2. **A child mentioned.** `is_yes_p(content, "Does the message mention a child or anyone under 18?")`, no criteria. Asked only when the first answer is yes, so most ordinary messages cost one call.
 
-Use exactly these question texts: the model was trained on them. The trained model was also taught the child question with criteria (`CHILD_CRITERIA` in the example), which adds about 80 tokens and time and was no more accurate (see the report); leave them out.
+Use exactly these question texts: the model was trained on them. It was also taught the child question with criteria (`CHILD_CRITERIA` in the example), but that form adds about 80 tokens to every call and has not been scored on the test for the trained model; with 0.4.1 the criteria made the answers worse. Leave them out.
 
 **Background for the child question.** "She slept in the next room" breaks the rule only if "she" is a child, so the content for the child question may carry what the application knows, in this exact shape:
 
@@ -27,13 +27,13 @@ Message: <the message, or one piece of it>
 
 `Known` is one or more short sentences about the children in the people's lives (name, whose child, age). `Before` is the message sent just before, by either side; it is never judged itself. Leave out a line that is empty; with neither line, pass the bare message without the `Message:` label. The model was trained to answer yes when the message refers to a known child by name or by "she", "he" or "they", and to answer no when a child is in the background but the message does not refer to them, so a parent's sexual talk with another adult still passes.
 
-**Thresholds.** Block when sexual is at or above SEXUAL_T and child is at or above CHILD_T. They are low on purpose: every doubt blocks. They were chosen on validation messages (half of the lowest answer any must-block validation message received), not on the test. A call that fails must block too.
+**Thresholds.** Block when sexual is at or above 0.03 and child is at or above 0.20. They are low on purpose: every doubt blocks. The rule set before looking at the test was: on validation messages, half of the lowest answer any must-block message received. That gave 0.03 for sexual (one mildly worded validation message scored 0.065) and 0.49 for child. The child threshold is then set lower still, at 0.20, as the more cautious choice; on the test it costs one more false alarm. A call that fails must block too.
 
 ## Long messages
 
 The model reads at most 256 tokens: content, question and criteria together, and it refuses longer input instead of cutting it. So a long message is read in overlapping pieces of whole sentences, about 320 characters each (about 80 tokens), every piece starting with the last sentence of the one before. Each question's answer for the message is the highest answer over its pieces, and the two are then combined, because the rule is about the whole message: sex in one paragraph and a child in another still blocks. Background lines are cut to 160 characters each (the end of `Before`, the start of `Known`), which keeps every call under about 200 tokens. `pieces()` and `check()` in the example do all of this.
 
-Cost: one call per piece for the first question, and one more per piece only when the message is sexual. On an M1 Pro a call of this size takes about SPEED_MS; see the report for a 150-word message.
+Cost: one call per piece for the first question, and one more per piece only when the message is sexual. On an M1 Pro a call takes about 75 to 90 ms: about 0.15 seconds for a short sexual message and about 0.7 seconds for a message of 130 to 220 words.
 
 ## What it is not good at
 
@@ -44,7 +44,7 @@ Cost: one call per piece for the first question, and one more per piece only whe
 
 ## How it was trained
 
-Version 0.4.3 is the 0.4.0 checkpoint trained further (2 or 3 passes at learning rate 5e-6, the way [candidate 0.4.2](../reports/v4.2/README.md) was made) on every earlier training file plus the guard records, then compressed and calibrated like 0.4.1.
+Version 0.4.3 is the 0.4.0 checkpoint trained further (3 passes at learning rate 5e-6, the second pass kept for its lowest validation loss, the way [candidate 0.4.2](../reports/v4.2/README.md) was made) on every earlier training file plus the guard records, then compressed and calibrated like 0.4.1.
 
 The guard texts are made by `training/guard/make_data.py`: Claude Sonnet wrote the training messages and Claude Opus the test messages (a different writer, different names), through the `claude` command. Claude Haiku then answered both questions for every text itself; a text was kept only when Haiku agreed with what the writer was asked for. Kinds: sexual talk between adults with no child (crude, tender, mild, with pet names and adult ages); plain talk about children, family, school and one's own childhood; sexual talk between adults in which a child is mentioned non-sexually (the class to block); messages that name a person only by first name or pronoun, each with two backgrounds, one making that person a child and one an adult (so the model must read the background); and ordinary talk with neither. `training/guard/build_rows.py` turns them into training records and adds borrowed backgrounds to texts written without one.
 
@@ -66,4 +66,4 @@ uv run code/rebundle.py --target macos-arm64 --model models/NAME --output models
 uv run code/build_python.py --target macos-arm64 --bundle models/0.4.3-macos-arm64 --version 0.4.3
 ```
 
-Training ran on a Colab A100 (about 9 minutes a pass).
+Training ran on a Colab A100, about 8 minutes a pass. Nothing was trained on the Mac.
