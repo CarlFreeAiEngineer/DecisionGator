@@ -1,13 +1,5 @@
 # DecisionGator 🐊
 
-## Project status
-
-Keep this section current: at the end of each work session, replace these three lines (don't append). If there is nothing left to do, say so and why, e.g. `none (finished)` or `none (parked: reason)`. `../LifeStaff/scripts/rundown.py` collects this section from every project.
-
-- Next step: more real training data for the evidence check (Hy3 and DeepSeek replies via OpenRouter, which costs money), then a larger reviewed test
-- Waiting on: a yes on OpenRouter spending
-- Last action: 2026-11-15, published evidence check 0.1 (experimental, catches about half of real inventions)
-
 ## Your software probably needs this.
 
 ## A Jev-like local AI inside a single .dll or .so
