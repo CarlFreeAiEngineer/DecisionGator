@@ -25,8 +25,23 @@ IGNORE = -100
 
 # ---------------------------------------------------------------- messages
 
+NEW_KINDS = {'added_detail', 'never_told', 'removed', 'added_clause'}
+
+
 def is_flip(r):
-    return bool(r.get('flip_of') or r.get('flipped_from') or r.get('kind') == 'removed')
+    return bool(r.get('flip_of') or r.get('flipped_from') or r.get('variant_of') or r.get('kind') == 'removed')
+
+
+def mark_scope(rows):
+    """Only clearly new information counts as unsupported. Borderline sentences, and unsupported ones that retell a
+    real event wrongly (wrong day, order, number, person), get r['ignore'] = True: they stay in the reply as context
+    but carry no label, in training and in scoring. Returns the number ignored."""
+    n = 0
+    for r in rows:
+        told_wrong = r['label'] == 'unsupported' and (r.get('type') != 'new' if r.get('kind') == 'real' else r.get('kind') not in NEW_KINDS)
+        r['ignore'] = bool(r.get('borderline') or told_wrong)
+        n += r['ignore']
+    return n
 
 
 def sort_key(item):
@@ -38,7 +53,9 @@ def build_messages(rows):
     """Group sentence records into messages. Returns a list of dicts:
     {'id', 'split', 'source_file', 'evidence', 'sentences': [(text, record or None)]}  (None = context only, no label).
     A reply is (group_id, run, question, context). Ordinary records of a reply with the same evidence form
-    one message. A flipped record (edited evidence) forms a message with the other sentences of the reply as context."""
+    one message. A flipped record (edited evidence) forms a message with the other sentences of the reply as context.
+    A variant record (variant_of = id of an original sentence, same evidence) forms its own message: the reply with
+    that one sentence replaced. Records marked ignore (see mark_scope) are context only."""
     def reply_key(r):
         return (r['group_id'], r.get('run'), r.get('question'), r['context'])
 
@@ -52,17 +69,18 @@ def build_messages(rows):
     for r in rows:
         if is_flip(r):
             continue
-        m = messages.setdefault((reply_key(r), r['evidence']), {'evidence': r['evidence'], 'sentences': []})
-        m['sentences'].append((r['statement'], r))
+        m = messages.setdefault((reply_key(r), r['evidence'], None), {'evidence': r['evidence'], 'sentences': []})
+        m['sentences'].append((r['statement'], None if r.get('ignore') else r))
     for r in rows:
-        if not is_flip(r):
+        if not is_flip(r) or r.get('ignore'):
             continue
         key = reply_key(r)
-        m = messages.get((key, r['evidence']))
+        mk = (key, r['evidence'], r['id'] if r.get('variant_of') else None)
+        m = None if r.get('variant_of') else messages.get(mk)
         if m is None:
-            m = messages[(key, r['evidence'])] = {'evidence': r['evidence'], 'sentences': [(b['statement'], None) for b in base.get(key, [])],
+            m = messages[mk] = {'evidence': r['evidence'], 'sentences': [(b['statement'], None) for b in base.get(key, [])],
                                                   'origins': [b['id'] for b in base.get(key, [])]}
-        origin = r.get('flip_of') or r.get('flipped_from')
+        origin = r.get('flip_of') or r.get('flipped_from') or r.get('variant_of')
         origins = m.get('origins', [])
         if origin in origins:
             m['sentences'][origins.index(origin)] = (r['statement'], r)
@@ -203,6 +221,8 @@ def train(args):
     rows = T.load_data(paths)
     if args.relabel:
         T.apply_relabels(rows, args.relabel)
+    if args.only_new_information:
+        print('ignored (borderline or told wrong):', mark_scope(rows), 'of', len(rows), flush=True)
     messages = build_messages(rows)
     stats_by_source = message_stats(messages)
     print('messages (counts):', json.dumps(stats_by_source), flush=True)
@@ -439,6 +459,8 @@ def main():
     parser.add_argument('--export', action='store_true')
     parser.add_argument('--model-id', default='evidence-check-message-0.1')
     parser.add_argument('--smoke', action='store_true', help='tiny CPU run (a few messages, 256 tokens, one step) incl. export')
+    parser.add_argument('--only-new-information', action='store_true',
+                        help='unsupported means clearly new information only; borderline and told-wrong sentences carry no label')
     parser.add_argument('--stats', action='store_true', help='only count messages and sentences per message')
     train(parser.parse_args())
 

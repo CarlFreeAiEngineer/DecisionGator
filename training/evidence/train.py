@@ -85,6 +85,8 @@ def apply_relabels(rows, paths):
         if item:
             changed += item['label'] != r['label']
             r['label'], r['borderline'] = item['label'], item.get('confidence') == 'unsure'
+            if item.get('type'):
+                r['type'] = item['type']
     print(f'relabels: {len(reviewed)} reviewed, {changed} labels changed', flush=True)
 
 

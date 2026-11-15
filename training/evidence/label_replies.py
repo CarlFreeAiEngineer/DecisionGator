@@ -46,9 +46,47 @@ Numbered sentences:
 {numbered}
 
 Return only a JSON array with one object per sentence, in order, no other text:
-[{{"n": 1, "label": "supported|unsupported|not_claim", "support": ["exact quote copied character for character from the EVIDENCE"], "why": "one short line", "borderline": false}}]
+[{{"n": 1, "label": "supported|unsupported|not_claim", "support": ["exact quote copied character for character from the EVIDENCE"], "why": "one short line", "borderline": false, "type": ""}}]
 "support" must be [] unless the label is supported (for supported claims, give one to three short exact quotes; for honest forgetting or when nothing applies, []).
-"borderline" is true only when a careful person could reasonably choose another label.{retry}"""
+"borderline" is true only when a careful person could reasonably choose another label.
+"type" is "" unless the label is unsupported. Then it is "new" when the sentence states information that appears nowhere in the evidence (an invented event, person, name, object or detail), or "told_wrong" when it retells something the evidence does hold but with a wrong day, order, number, place or person.{retry}"""
+
+TYPE_PROMPT = """A sentence of a reply was judged NOT supported by the evidence the reply was written from. Say which kind of error it is.
+
+- new: the sentence states information that appears nowhere in the evidence (an invented event, person, name, object or detail), even if the rest of the sentence is in the evidence.
+- told_wrong: it retells something the evidence does hold, but with a wrong day, order, number, place or person.
+
+=== EVIDENCE ===
+{evidence}
+=== END EVIDENCE ===
+
+Reply: {reply}
+
+Sentence: {sentence}
+Why it was judged unsupported: {why}
+
+Answer with one word: new or told_wrong."""
+
+
+def add_types(path: Path, workers: int):
+    """Give every unsupported record without a "type" one (new or told_wrong), then rewrite the file."""
+    rows = [json.loads(x) for x in gzip.open(path, "rt", encoding="utf-8")]
+    todo = [r for r in rows if r["label"] == "unsupported" and r.get("type") not in ("new", "told_wrong")]
+    print(f"{len(todo)} unsupported records need a type", file=sys.stderr)
+
+    def one(r):
+        got = claude(TYPE_PROMPT.format(evidence=r["evidence"], reply=r["context"], sentence=r["statement"], why=r.get("why", ""))).lower()
+        r["type"] = "told_wrong" if "told_wrong" in got else "new" if "new" in got else ""
+
+    with ThreadPoolExecutor(workers) as ex:
+        list(ex.map(one, todo))
+    tmp = path.with_suffix(".tmp")
+    with gzip.open(tmp, "wt", encoding="utf-8") as f:
+        for r in rows:
+            f.write(json.dumps(r, ensure_ascii=False) + "\n")
+    tmp.replace(path)
+    from collections import Counter
+    print(dict(Counter(r.get("type") for r in rows if r["label"] == "unsupported")), file=sys.stderr)
 
 
 def split_sentences(text: str) -> list[str]:
@@ -160,7 +198,8 @@ def load_reply(run_dir: Path, q: str, rep: dict, verd: dict, split: str, model: 
             "split": split, "license": "CC0-1.0",
             "provenance": {"generated_by": f"labeling model {LABEL_MODEL} via claude CLI", "date": today,
                            "note": "labeled against the prompt evidence; judge verdict used only as a hint"},
-            "support": g.get("support") or [], "why": g.get("why", ""), "borderline": bool(g.get("borderline", False)), "model": model, "run": run_dir.name,
+            "support": g.get("support") or [], "why": g.get("why", ""), "borderline": bool(g.get("borderline", False)),
+            "type": g.get("type") if lab == "unsupported" and g.get("type") in ("new", "told_wrong") else "", "model": model, "run": run_dir.name,
             "question": q, "sentence_index": i + 1, "judge_verdict": verd.get("verdict", "?"),
             **({"needs_review": True} if review else {})})
     return recs
@@ -173,15 +212,20 @@ def main():
     ap.add_argument("--verdicts", help="only replies with these judge verdicts, comma separated (e.g. wrong,partly)")
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--out", type=Path, default=OUT)
+    ap.add_argument("--add-types", action="store_true", help="only add new/told_wrong to unsupported records that lack it")
     a = ap.parse_args()
     if not shutil.which("claude"):
         sys.exit("error: the `claude` command is not on PATH. Install Claude Code and sign in first.")
+    if a.add_types:
+        return add_types(a.out, a.workers)
     if not RUNS.is_dir():
         sys.exit(f"error: run folders not found at {RUNS} (set REALAI_RUNS)")
     names = a.runs or sorted(p.name for p in RUNS.iterdir() if re.fullmatch(r"app-[a-z0-9]+-\d+", p.name))
     allq = sorted({f"P{n:03d}" for n in range(1, 107)})
     pick = random.Random(20261114).sample(allq, 20)
     heldout = {q: ("validation" if i < 10 else "calibration") for i, q in enumerate(pick)}
+    # 36 more questions are test only: no reply to them, from any model, is trained on (see specs/evidence-check.md).
+    heldout.update({q: "test" for q in random.Random(20261115).sample([q for q in allq if q not in heldout], 36)})
     want = set(a.verdicts.split(",")) if a.verdicts else None
     a.out.parent.mkdir(parents=True, exist_ok=True)
     done = set()
@@ -204,7 +248,7 @@ def main():
                 continue
             if want and verds[q].get("verdict") not in want:
                 continue
-            split = "test" if model == "hy3" else heldout.get(q, "train")
+            split = "test" if name == "app-hy3-1" else heldout.get(q, "train")  # app-hy3-1 is the first, hand-reviewed test
             jobs.append((d, q, reps[q], verds[q], split, model))
     if a.limit:
         jobs = jobs[:a.limit]
