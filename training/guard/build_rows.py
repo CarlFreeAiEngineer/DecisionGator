@@ -26,7 +26,7 @@ from tokenizers import Tokenizer
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'examples'))
-from guard_check import CHILD_CRITERIA, CHILD_QUESTION, SEXUAL_QUESTION, child_content  # noqa: E402
+from guard_check import CHILD_CRITERIA, CHILD_QUESTION, SEXUAL_QUESTION, child_content, pieces  # noqa: E402
 
 DATA = ROOT / 'data/local/guard'
 MAX_TOKENS = 256
@@ -92,6 +92,19 @@ def main():
             continue
         roll = chance(item['group'], 'split')
         split = 'train' if roll < .88 else 'validation' if roll < .95 else 'calibration'
+        if item['kind'].startswith('long'):
+            if split == 'validation':
+                validation.append(item)
+            # A long message is judged in pieces, and which piece holds the child or the sex is not known. What is
+            # known: no piece of a message without a child mentions one, and no piece of a non-sexual message is sexual.
+            for k, piece in enumerate(pieces(item['text'])):
+                if not item['child'] and (piece.casefold(), False) not in seen:
+                    seen.add((piece.casefold(), False))
+                    rows.append(record(item, CHILD_QUESTION, piece, 0, None, 'guard_child', split, f'p{k}c'))
+                if not item['sexual'] and piece.casefold() not in seen:
+                    seen.add(piece.casefold())
+                    rows.append(record(item, SEXUAL_QUESTION, piece, 0, None, 'guard_sexual', split, f'p{k}s'))
+            continue
         content = child_content(item['text'], item['known'], item['before'])
         if not fits(content, CHILD_QUESTION + criteria_text):
             too_long += 1

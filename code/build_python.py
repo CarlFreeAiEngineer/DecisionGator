@@ -25,11 +25,14 @@ TARGETS = {
 
 
 def main():
+    global VERSION
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--target', choices=TARGETS, required=True)
     parser.add_argument('--bundle', type=Path)
     parser.add_argument('--output', type=Path, default=ROOT / 'released/python')
+    parser.add_argument('--version', default=VERSION, help='package version, when the bundle holds a newer model')
     args = parser.parse_args()
+    VERSION = args.version
     platform_tag, library = TARGETS[args.target]
     bundle = (args.bundle or ROOT / 'released' / args.target).resolve()
     manifest = json.loads((bundle / 'manifest.json').read_text(encoding='utf-8'))

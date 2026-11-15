@@ -97,6 +97,7 @@ SEX_TWISTS = [
     'No pet names in these.',
     'These are mild: plainly about sex or sexual wanting, but without crude words (an ache, wanting to be undressed, hands under clothes, waking aroused).',
     'Each is from a fantasy character (use: {cast}) and speaks of sex in that character\'s own way.',
+    'These are mild and brief: plainly an invitation to sex or a wish for it, in everyday words with nothing crude ("take me to bed", "stay the night with me", "I want you tonight", "come and undress me").',
 ]
 CHILDREN = ['a daughter of six', 'a son of nine', 'a baby', 'a toddler', 'twins of four', 'a niece', 'a nephew', 'a stepson of twelve',
             'a teenage daughter of fifteen', 'a son of seventeen', 'a grandchild', 'a kid brother of ten', 'the neighbour\'s children',
@@ -116,6 +117,7 @@ BLOCK_TWISTS = [
     'In these the sexual content is mild, with no crude words, yet plainly about sex.',
     'In these the writer recalls their own childhood in one non-sexual sentence ("when I was seven my father left", "at twelve I herded goats") and in another sentence speaks of sex now, as an adult, with nothing joining the two.',
     'Each is from a fantasy character (use: {cast}) and the child is of that world (a page, a village child, the queen\'s young son, an apprentice of twelve).',
+    'In these the sexual content is mild and brief: plainly an invitation to sex or a wish for it between the adults, in everyday words with nothing crude ("take me to bed", "stay the night with me", "I want you tonight").',
 ]
 CHILD_TOPICS = ['a daughter starting school', 'a son\'s football match', 'bedtime stories', 'a toddler\'s tantrum', 'a baby not sleeping', 'a teenager learning to drive',
                 'a niece\'s birthday', 'a child\'s drawing', 'homework', 'a sick child', 'the writer\'s own childhood (with an age under 18 or "when I was a kid")',
@@ -129,12 +131,15 @@ TONES = ['warm', 'worn out', 'joking', 'formal and old-fashioned', 'short lowerc
 CHILD_TWISTS = ['', '', 'Half of these also call the adult reader by a pet name ({pets}).', 'In half, the child is named with a first name (use: {names}).',
                 'These are about the writer\'s own childhood: a memory with an age under 18 or words like "when I was a boy", "as a girl", "when we were kids".',
                 'In these the mention of the child is short and in passing, inside a message about something else.',
-                'Each is from a fantasy character (use: {cast}).']
+                'Each is from a fantasy character (use: {cast}).',
+                'Each has a line of narration or scene between asterisks (*she sets down the cup*) and warm, close speech to the adult reader with a pet name ({pets}); the child is mentioned in passing. Nothing sexual at all.']
 NEUTRAL_TWISTS = ['', 'Each calls the adult reader by a pet name; use these across them: {pets}.', 'Each calls the adult reader by a pet name; use these across them: {pets}.',
                   'Use words that sound young but are about adults, animals or things: "baby carrots", "kidding", "girls night", "the boys from work", "child\'s play", "my goat had kids" is NOT allowed, "babysitting a dog" is NOT allowed, "young wine", "boyfriend", "old girl" for a car, "little" for a thing.',
                   'Each mentions an adult relative or friend with a first name (use: {names}) and makes clear in the message that they are grown (my wife, my brother who is forty, my boss).',
                   'These show plain affection or romance without anything sexual: holding hands, a kiss goodnight, missing someone, a compliment.',
-                  'Each is from a fantasy character (use: {cast}).']
+                  'Each is from a fantasy character (use: {cast}).',
+                  'Each has a line of narration or scene between asterisks (*she sets down the cup*) and warm, close speech to the adult reader with a pet name ({pets}): sitting by a fire, sharing a drink, a kiss goodnight, being glad the other came. Nothing sexual at all.',
+                  'Each has a line of narration or scene between asterisks (*she sets down the cup*) and warm, close speech to the adult reader with a pet name ({pets}): sitting by a fire, sharing a drink, a kiss goodnight, being glad the other came. Nothing sexual at all.']
 NAMES = {
     'train': ['Mia', 'Tom', 'Lena', 'Jonas', 'Ella', 'Max', 'Sofia', 'Ben', 'Clara', 'Finn', 'Nora', 'Leo', 'Ivy', 'Sam', 'Ruth', 'Theo', 'Anya', 'Milo', 'Greta', 'Kai',
               'Bell', 'Wren', 'Osric', 'Tamsin', 'Edda', 'Corin', 'Maeve', 'Rafi', 'Yuki', 'Dara'],
@@ -184,6 +189,13 @@ def render(item):
     return '\n'.join(lines + ['Message: ' + item['text']]) if lines else item['text']
 
 
+TWIST = None  # --twist: only writing tasks whose twist holds this text
+
+
+def pick(rng, twists):
+    return rng.choice([t for t in twists if TWIST in t] if TWIST else twists)
+
+
 def card(kind, which, rng, n):
     """One writing task: (prompt, [(kind name, sexual, child) for each expected item])."""
     names = ', '.join(rng.sample(NAMES[which], 6))
@@ -195,13 +207,13 @@ def card(kind, which, rng, n):
     sexual = child = None
     name = kind
     if kind == 'adult_sex':
-        values['twist'] = rng.choice(SEX_TWISTS).format(**fill); sexual, child = 1, 0
+        values['twist'] = pick(rng, SEX_TWISTS).format(**fill); sexual, child = 1, 0
     elif kind == 'block':
-        values['twist'] = rng.choice(BLOCK_TWISTS).format(**fill); sexual, child = 1, 1
+        values['twist'] = pick(rng, BLOCK_TWISTS).format(**fill); sexual, child = 1, 1
     elif kind == 'child_plain':
-        values['twist'] = rng.choice(CHILD_TWISTS).format(**fill); values['topics'] = '; '.join(rng.sample(CHILD_TOPICS, 5)); sexual, child = 0, 1
+        values['twist'] = pick(rng, CHILD_TWISTS).format(**fill); values['topics'] = '; '.join(rng.sample(CHILD_TOPICS, 5)); sexual, child = 0, 1
     elif kind == 'neutral':
-        values['twist'] = rng.choice(NEUTRAL_TWISTS).format(**fill); values['topics'] = '; '.join(rng.sample(NEUTRAL_TOPICS, 5)); sexual, child = 0, 0
+        values['twist'] = pick(rng, NEUTRAL_TWISTS).format(**fill); values['topics'] = '; '.join(rng.sample(NEUTRAL_TOPICS, 5)); sexual, child = 0, 0
     elif kind == 'pair':
         sexual = rng.choice([1, 1, 0])
         values['sexual_part'] = ('Each message has sexual content between the writer and the adult reader ("you"); the other person is only mentioned, non-sexually (asleep in the house, away until Sunday, coming home at five, would like the reader, left a note). Styles: ' + values['styles'] + '.') if sexual else \
@@ -281,10 +293,17 @@ def main():
     parser.add_argument('--workers', type=int, default=8)
     parser.add_argument('--seed', type=int, default=1)
     parser.add_argument('--only', action='append', help='only these kinds')
+    parser.add_argument('--calls', action='append', default=[], metavar='KIND=N', help='this many writing calls for a kind, instead of the usual number')
+    parser.add_argument('--twist', help='only writing tasks whose special instruction holds this text (for example "mild")')
     args = parser.parse_args()
+    global TWIST
+    TWIST = args.twist
     # Writing calls per kind, each for 10 messages (pairs: 8, long: 4).
     calls = {'train': {'adult_sex': 75, 'block': 75, 'child_plain': 50, 'neutral': 35, 'pair': 60},
              'test': {'adult_sex': 20, 'block': 20, 'child_plain': 14, 'neutral': 10, 'pair': 18, 'long': 30}}[args.which]
+    for override in args.calls:
+        kind, count = override.split('=')
+        calls[kind] = int(count)
     OUT.mkdir(parents=True, exist_ok=True)
     out_path = OUT / f'items-{args.which}.jsonl'
     stats = {'failed_calls': 0}

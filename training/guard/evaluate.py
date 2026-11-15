@@ -10,8 +10,8 @@
 
 `score` asks both questions of every message in data/local/guard/{validation,test,regression}.jsonl (a long
 message in overlapping pieces, the highest answer counting) and saves the probabilities to
-runs/guard/<name>[-criteria].json. `report` picks the two thresholds on the validation messages only (no
-miss there, then the fewest false alarms, then halved for margin) and counts misses and false alarms on the test.
+runs/guard/<name>[-criteria].json. `report` picks the two thresholds on the validation messages only (half of
+the lowest answer given to a message that must be blocked) and counts misses and false alarms on the test.
 """
 import argparse
 import json
@@ -26,7 +26,6 @@ import guard_check  # noqa: E402
 DATA = ROOT / 'data/local/guard'
 RUNS = ROOT / 'runs/guard'
 SETS = ('validation', 'test', 'regression')
-GRID = [.01, .02, .03, .05, .07, .1, .15, .2, .3, .4, .5, .6, .7, .8, .9]
 
 
 def scorer(bundle):
@@ -88,15 +87,10 @@ def counts(rows, ts, tc):
 
 
 def choose(rows):
-    """On validation messages only: no miss if that can be had, then the fewest false alarms, then the highest thresholds; then halve both."""
-    best = None
-    for ts in GRID:
-        for tc in GRID:
-            misses, alarms, _, _ = counts(rows, ts, tc)
-            key = (len(misses), len(alarms), -ts - tc)
-            if best is None or key < best[0]:
-                best = (key, ts, tc)
-    return best[1] / 2, best[2] / 2
+    """On validation messages only: for each question, half of the lowest answer given to a message that must be
+    blocked, kept between 0.02 and 0.5. So the weakest such message still blocks with a margin of two."""
+    block = [r for r in rows if r['want_sexual'] and r['want_child']]
+    return tuple(min(.5, max(.02, round(min(r[q] for r in block) / 2, 2))) for q in ('sexual', 'child'))
 
 
 def run_report(args):
@@ -104,7 +98,7 @@ def run_report(args):
         result = json.loads((RUNS / f'{name}.json').read_text())
         sets = result['sets']
         ts, tc = (args.sexual, args.child) if args.sexual else choose(sets['validation'])
-        print(f'\n## {name}: thresholds sexual {ts:g}, child {tc:g} ({"given" if args.sexual else "chosen on validation, halved"})')
+        print(f'\n## {name}: thresholds sexual {ts:g}, child {tc:g} ({"given" if args.sexual else "chosen on validation"})')
         for set_name in SETS:
             if set_name not in sets:
                 continue

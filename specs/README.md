@@ -20,6 +20,7 @@ The product goal is general reuse across question types, not a fixed refund dete
 8. [Ordinary component interfaces](component-api.md): automatic initialization, simple calls, and Java packaging.
 9. [Node.js and WebAssembly](javascript-and-webassembly.md): implemented bindings, shared weights, browser deployment, and verification.
 10. [Evidence check](evidence-check.md): a second, long-input model that says whether a long text supports a sentence (in progress).
+11. [Guard check](guard-check.md): a worked safety check for an adults-only site, two yes/no questions combined in code, with background lines and long messages read in pieces.
 
 ## Firm requirements
 
